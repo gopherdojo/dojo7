@@ -3,6 +3,8 @@ package image
 
 import (
 	"fmt"
+	"image"
+	"image/gif"
 	"image/jpeg"
 	"image/png"
 	"os"
@@ -45,10 +47,17 @@ func FmtConv(path string, exts ConvExts)(err error){
 		return err
 	}
 
-	// jpegファイルをデコード
-	img, err := jpeg.Decode(f)
-	if err != nil {
-		return err
+	var img image.Image
+	var decodeErr error
+
+	switch exts.inExt {
+	case "jpeg", "jpg": img, decodeErr = jpeg.Decode(f)
+	case "png": img, decodeErr = png.Decode(f)
+	case "gif": img, decodeErr = gif.Decode(f)
+	}
+
+	if decodeErr != nil {
+		return decodeErr
 	}
 
 	outputFile, err := os.Create(pathWithoutExt + exts.outExt)
@@ -58,9 +67,15 @@ func FmtConv(path string, exts ConvExts)(err error){
 		return err
 	}
 
-	err = png.Encode(outputFile, img)
-	if err == nil {
+	var encodeErr error
+	switch exts.outExt {
+	case "jpeg", "jpg": encodeErr = jpeg.Encode(outputFile, img, nil)
+	case "png": encodeErr = png.Encode(outputFile, img)
+	case "gif": encodeErr = gif.Encode(outputFile, img, nil)
+	}
+
+	if encodeErr == nil {
 		err = os.Remove(path)
 	}
-	return err
+	return encodeErr
 }
