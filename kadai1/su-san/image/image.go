@@ -1,6 +1,7 @@
 package image
 
 import (
+	"fmt"
 	"image/jpeg"
 	"image/png"
 	"os"
@@ -12,20 +13,22 @@ type ConvExts struct {
 	inExt, outExt string
 }
 
-func NewFormats(in, out string) ConvExts{
+func NewConvExts(in, out string) ConvExts{
 	if in == ""{
-		in = "jpg"
+		in = ".jpg"
 	}
 
 	if out == "" {
-		out = "png"
+		out = ".png"
 	}
 	return ConvExts{inExt: in, outExt: out}
 }
 
 func FmtConv(path string, exts ConvExts)(err error){
-	pathWithoutExt := filepath.Base(path)
+	pathWithoutExt := path[:len(path)-len(filepath.Ext(path))]
 	ext := filepath.Ext(path)
+
+	fmt.Println(pathWithoutExt, ext)
 
 	// 別フォーマットのファイルはスルーする
 	if ext != exts.inExt {
