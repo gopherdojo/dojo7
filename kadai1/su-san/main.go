@@ -6,13 +6,12 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-
 	"github.com/gopherdojo/dojo7/kadai1/su-san/image"
 )
 
 func main() {
 
-	// Usage文言
+	// Usageメッセージ
 	flag.Usage = func() {
 		fmt.Fprintln(os.Stderr, `Usage :
    convimg target_directory`)
@@ -34,7 +33,7 @@ func main() {
 		convExts := image.NewConvExts("", "")
 		err := image.FmtConv(f, convExts)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println(f, err)
 		}
 	}
 }
