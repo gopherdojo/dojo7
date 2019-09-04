@@ -37,6 +37,11 @@ func main() {
 		return
 	}
 
+	// 変換対象のフォーマットと変換フォーマットが同じなら何もせず終了
+	if *inputExt == *outputExt {
+		return
+	}
+
 	targetFiles := dirwalk(targetDir)
 	convExts := image.NewConvExts(*inputExt, *outputExt)
 
