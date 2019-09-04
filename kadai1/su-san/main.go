@@ -58,7 +58,7 @@ func main() {
 	}
 }
 
-// dirwalk は与えられたディレクト以下のファイルパスをリストで返します
+// dirwalk は与えられたディレクトリ以下のファイルパスをリストで返します
 func dirwalk(dir string) []string {
 
 	files, err := ioutil.ReadDir(dir)
