@@ -1,4 +1,4 @@
-// image は画像のフォーマットを変換するためのパッケージです。
+// Pacakage image は画像のフォーマットを変換するためのパッケージです。
 package image
 
 import (
@@ -16,8 +16,8 @@ type ConvExts struct {
 }
 
 //NewConvExts は変換対象のフォーマットと変換先のフォーマットを表す構造体です
-func NewConvExts(in, out string) ConvExts{
-	if in == ""{
+func NewConvExts(in, out string) ConvExts {
+	if in == "" {
 		in = "jpg"
 	}
 
@@ -28,7 +28,7 @@ func NewConvExts(in, out string) ConvExts{
 }
 
 // FmtConv は指定されたフォーマットからフォーマットへ変換する関数です
-func FmtConv(path string, exts ConvExts)(err error){
+func FmtConv(path string, exts ConvExts) (err error) {
 	pathWithoutExt := path[:len(path)-len(filepath.Ext(path))+1]
 	ext := filepath.Ext(path)[1:]
 
@@ -48,9 +48,12 @@ func FmtConv(path string, exts ConvExts)(err error){
 	var decodeErr error
 
 	switch exts.inExt {
-	case "jpeg", "jpg": img, decodeErr = jpeg.Decode(f)
-	case "png": img, decodeErr = png.Decode(f)
-	case "gif": img, decodeErr = gif.Decode(f)
+	case "jpeg", "jpg":
+		img, decodeErr = jpeg.Decode(f)
+	case "png":
+		img, decodeErr = png.Decode(f)
+	case "gif":
+		img, decodeErr = gif.Decode(f)
 	}
 
 	if decodeErr != nil {
@@ -66,9 +69,12 @@ func FmtConv(path string, exts ConvExts)(err error){
 
 	var encodeErr error
 	switch exts.outExt {
-	case "jpeg", "jpg": encodeErr = jpeg.Encode(outputFile, img, nil)
-	case "png": encodeErr = png.Encode(outputFile, img)
-	case "gif": encodeErr = gif.Encode(outputFile, img, nil)
+	case "jpeg", "jpg":
+		encodeErr = jpeg.Encode(outputFile, img, nil)
+	case "png":
+		encodeErr = png.Encode(outputFile, img)
+	case "gif":
+		encodeErr = gif.Encode(outputFile, img, nil)
 	}
 
 	if encodeErr == nil {

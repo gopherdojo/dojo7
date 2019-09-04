@@ -6,14 +6,14 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
 	"github.com/gopherdojo/dojo7/kadai1/su-san/image"
 )
-
 
 func main() {
 
 	inputExt := flag.String("i", "jpg", " extension to be converted ")
-	outputExt := flag.String( "o", "png", " extension after conversion")
+	outputExt := flag.String("o", "png", " extension after conversion")
 
 	// Usageメッセージ
 	flag.Usage = func() {
@@ -31,14 +31,15 @@ func main() {
 
 	targetDir := args[0]
 
-	// ディレクトリがなければ知らせる
+	// ディレクトリがなければ知らせて終了
 	if _, err := os.Stat(targetDir); err != nil {
-		fmt.Printf("%v\n",  err)
+		fmt.Printf("%v\n", err)
 		return
 	}
-	targetFiles := dirwalk(targetDir)
 
+	targetFiles := dirwalk(targetDir)
 	convExts := image.NewConvExts(*inputExt, *outputExt)
+
 	for _, f := range targetFiles {
 
 		err := image.FmtConv(f, convExts)
@@ -50,6 +51,7 @@ func main() {
 
 // dirwalk は与えられたディレクト以下のファイルパスをリストで返します
 func dirwalk(dir string) []string {
+
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
 		panic(err)
@@ -63,6 +65,5 @@ func dirwalk(dir string) []string {
 		}
 		paths = append(paths, filepath.Join(dir, file.Name()))
 	}
-
 	return paths
 }
