@@ -10,12 +10,12 @@ import (
 	"path/filepath"
 )
 
-//ConvExts は変換対象のフォーマットと変換先のフォーマットを表す構造体です
+// ConvExts は変換対象のフォーマットと変換先のフォーマットを表す構造体です
 type ConvExts struct {
 	inExt, outExt string
 }
 
-//NewConvExts は変換対象のフォーマットと変換先のフォーマットを表す構造体です
+// NewConvExts は変換対象のフォーマットと変換先のフォーマットを表す構造体です
 func NewConvExts(in, out string) ConvExts {
 	if in == "" {
 		in = "jpg"
