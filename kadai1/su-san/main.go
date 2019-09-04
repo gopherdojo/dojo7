@@ -12,15 +12,12 @@ import (
 
 func main() {
 
-	var inputExt string
-	var outputExt string
+	inputExt := flag.String("i", "jpg", " extension to be converted ")
+	outputExt := flag.String( "o", "png", " extension after conversion")
 
-	flag.StringVar(&inputExt,"i", "jpg", " extension to be converted ")
-	flag.StringVar(&outputExt, "o", "png", " extension after conversion")
 	// Usageメッセージ
 	flag.Usage = func() {
-		fmt.Fprintln(os.Stderr, `Usage :
-   convimg target_directory`)
+		fmt.Fprintln(os.Stderr, "usage : cmd [-i] [-o] target_dir")
 		flag.PrintDefaults()
 	}
 
@@ -33,10 +30,17 @@ func main() {
 	}
 
 	targetDir := args[0]
+
+	// ディレクトリがなければ知らせる
+	if _, err := os.Stat(targetDir); err != nil {
+		fmt.Printf("%v\n",  err)
+		return
+	}
 	targetFiles := dirwalk(targetDir)
 
+	convExts := image.NewConvExts(*inputExt, *outputExt)
 	for _, f := range targetFiles {
-		convExts := image.NewConvExts(inputExt, outputExt)
+
 		err := image.FmtConv(f, convExts)
 		if err != nil {
 			fmt.Println(f, err)

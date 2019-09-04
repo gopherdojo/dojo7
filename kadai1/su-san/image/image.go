@@ -2,7 +2,6 @@
 package image
 
 import (
-	"fmt"
 	"image"
 	"image/gif"
 	"image/jpeg"
@@ -19,21 +18,19 @@ type ConvExts struct {
 //NewConvExts は変換対象のフォーマットと変換先のフォーマットを表す構造体です
 func NewConvExts(in, out string) ConvExts{
 	if in == ""{
-		in = ".jpg"
+		in = "jpg"
 	}
 
 	if out == "" {
-		out = ".png"
+		out = "png"
 	}
 	return ConvExts{inExt: in, outExt: out}
 }
 
 // FmtConv は指定されたフォーマットからフォーマットへ変換する関数です
 func FmtConv(path string, exts ConvExts)(err error){
-	pathWithoutExt := path[:len(path)-len(filepath.Ext(path))]
-	ext := filepath.Ext(path)
-
-	fmt.Println(pathWithoutExt, ext)
+	pathWithoutExt := path[:len(path)-len(filepath.Ext(path))+1]
+	ext := filepath.Ext(path)[1:]
 
 	// 別フォーマットのファイルはスルーする
 	if ext != exts.inExt {
