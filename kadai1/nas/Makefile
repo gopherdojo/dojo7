@@ -27,8 +27,9 @@ analyze: ## do static code analysis
 	golint ./...
 
 .PHONY: remove
-remove: ## remove binary
+remove: ## remove binary and test output data
 	rm -f ./${BINARYNAME}
+	ls testdata | grep -v ".jpg" | xargs -I {} echo "testdata/"{} | xargs rm -f
 
 .PHONY: all
 all: remove clean test analyze build ## run 'build' with 'remove', 'clean', 'test' and 'analyze'
