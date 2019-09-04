@@ -29,7 +29,7 @@ analyze: ## do static code analysis
 .PHONY: remove
 remove: ## remove binary and test output data
 	rm -f ./${BINARYNAME}
-	ls testdata | grep -v ".jpg" | xargs -I {} echo "testdata/"{} | xargs rm -f
+	ls -a testdata | grep -v -E '^.+\.jpg' | grep -v -E '^\.+$$' | xargs -I {} echo "testdata/"{} | xargs rm
 
 .PHONY: all
 all: remove clean test analyze build ## run 'build' with 'remove', 'clean', 'test' and 'analyze'
