@@ -9,8 +9,14 @@ import (
 	"github.com/gopherdojo/dojo7/kadai1/su-san/image"
 )
 
+
 func main() {
 
+	var inputExt string
+	var outputExt string
+
+	flag.StringVar(&inputExt,"i", "jpg", " extension to be converted ")
+	flag.StringVar(&outputExt, "o", "png", " extension after conversion")
 	// Usageメッセージ
 	flag.Usage = func() {
 		fmt.Fprintln(os.Stderr, `Usage :
@@ -30,7 +36,7 @@ func main() {
 	targetFiles := dirwalk(targetDir)
 
 	for _, f := range targetFiles {
-		convExts := image.NewConvExts("", "")
+		convExts := image.NewConvExts(inputExt, outputExt)
 		err := image.FmtConv(f, convExts)
 		if err != nil {
 			fmt.Println(f, err)
