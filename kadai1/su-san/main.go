@@ -42,8 +42,12 @@ func main() {
 		return
 	}
 
-	targetFiles := dirwalk(targetDir)
 	convExts := image.NewConvExts(*inputExt, *outputExt)
+	if convExts.SupportedFormats() == false {
+		fmt.Println("unsupported format! please specify these format [png jpg jpeg gif]")
+		return
+	}
+	targetFiles := dirwalk(targetDir)
 
 	for _, f := range targetFiles {
 

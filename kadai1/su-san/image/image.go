@@ -1,4 +1,4 @@
-// Pacakage image は画像のフォーマットを変換するためのパッケージです。
+// Package image は画像のフォーマットを変換するためのパッケージです。
 package image
 
 import (
@@ -10,9 +10,21 @@ import (
 	"path/filepath"
 )
 
+var supportedFormats = map[string]int{"jpg": 1, "jpeg": 1, "png": 1, "gif": 1}
+
+func supportedFormat(ext string) bool {
+	_, ok := supportedFormats[ext]
+	return ok
+}
+
 // ConvExts は変換対象のフォーマットと変換先のフォーマットを表す構造体です
 type ConvExts struct {
 	inExt, outExt string
+}
+
+// SupportedFormats は指定フォーマットが対応しているか確認するメソッドです
+func (c ConvExts) SupportedFormats() bool {
+	return supportedFormat(c.inExt) && supportedFormat(c.outExt)
 }
 
 // NewConvExts は変換対象のフォーマットと変換先のフォーマットを表す構造体です
