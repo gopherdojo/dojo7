@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"path/filepath"
 
@@ -18,15 +19,17 @@ func main() {
 func run() error {
 	flag.Parse()
 	args := flag.Args()
-	for _, arg := range args {
-		path, err := filepath.Abs(arg)
-		if err != nil {
-			return err
-		}
-		err = imachan.Convert(path, "jpg", "png")
-		if err != nil {
-			return err
-		}
+	if len(args) < 1 {
+		err := fmt.Errorf("no target")
+		return err
+	}
+	path, err := filepath.Abs(args[0])
+	if err != nil {
+		return err
+	}
+	err = imachan.Convert(path, "jpg", "png")
+	if err != nil {
+		return err
 	}
 	return nil
 }

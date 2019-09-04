@@ -2,12 +2,10 @@
 
 ## imachan is the command to convert images
 
-## How to use
+## How to get
 
 ```go
 $ go get github.com/gopherdojo/dojo7/kadai1/nas/cmd/imachan
-$ imachan foo.jpg
-success: foo.jpg -> foo.png
 ```
 
 ## Can convert images under the directories
