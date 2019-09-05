@@ -31,12 +31,6 @@ func main() {
 
 	targetDir := args[0]
 
-	// ディレクトリがなければ知らせて終了
-	if _, err := os.Stat(targetDir); err != nil {
-		fmt.Printf("%v\n", err)
-		return
-	}
-
 	// 変換対象のフォーマットと変換フォーマットが同じなら何もせず終了
 	if *inputExt == *outputExt {
 		return
@@ -61,9 +55,10 @@ func main() {
 // dirwalk は与えられたディレクトリ以下のファイルパスをリストで返します
 func dirwalk(dir string) []string {
 
-	files, err := ioutil.ReadDir(dir)
-	if err != nil {
-		panic(err)
+	// ディレクトリがなければ知らせて終了
+	if _, err := os.Stat(dir); err != nil {
+		fmt.Printf("%v\n", err)
+		os.Exit(1)
 	}
 
 	var paths []string
