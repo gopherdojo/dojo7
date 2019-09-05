@@ -7,19 +7,35 @@ import (
 	"image/png"
 	"os"
 	"path/filepath"
+	"strings"
+)
+
+const (
+	jpegFormat = iota
+	pngFormat
 )
 
 // Config is ...
 type Config struct {
 	Path       string
-	fromFormat string
-	toFormat   string
+	fromFormat int
+	toFormat   int
 }
 
 // NewConfig is ...
-func NewConfig(dir, fromFormat, toFormat string) (*Config, error) {
+func NewConfig(dir, fromFormatStr, toFormatStr string) (*Config, error) {
 	path, err := filepath.Abs(dir)
 	if err != nil {
+		return nil, err
+	}
+	fromFormat := getImageFormat(fromFormatStr)
+	if fromFormat == -1 {
+		err := fmt.Errorf("undefind %s file format, please choose another", fromFormatStr)
+		return nil, err
+	}
+	toFormat := getImageFormat(toFormatStr)
+	if toFormat == -1 {
+		err := fmt.Errorf("undefind %s file format, please choose another", toFormatStr)
 		return nil, err
 	}
 	return &Config{
@@ -35,6 +51,10 @@ func (c *Config) Run() error {
 		if info.IsDir() {
 			return nil
 		}
+		pathFormat := getImageFormat(strings.Replace(filepath.Ext(path), ".", "", 1))
+		if pathFormat != c.fromFormat {
+			return nil
+		}
 		err = convert(path, c.fromFormat, c.toFormat)
 		if err != nil {
 			return err
@@ -47,7 +67,18 @@ func (c *Config) Run() error {
 	return nil
 }
 
-func convert(fromPath, fromFormat, toFormat string) error {
+func getImageFormat(formatStr string) int {
+	switch formatStr {
+	case "jpg", "jpeg":
+		return jpegFormat
+	case "png":
+		return pngFormat
+	default:
+		return -1
+	}
+}
+
+func convert(fromPath string, fromFormat, toFormat int) error {
 	f, err := os.Open(fromPath)
 	if err != nil {
 		return err
