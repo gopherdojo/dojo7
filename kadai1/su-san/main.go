@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
+	//"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -41,7 +41,19 @@ func main() {
 		fmt.Println("unsupported format! please specify these format [png jpg jpeg gif]")
 		return
 	}
-	targetFiles := dirwalk(targetDir)
+
+	targetFiles := []string{}
+	err := filepath.Walk(targetDir, func(path string, info os.FileInfo, err error) error {
+		if filepath.Ext(path) == ("." + *inputExt) {
+			targetFiles = append(targetFiles, path)
+		}
+		return nil
+	})
+
+	if err != nil {
+		fmt.Println("file open error")
+		return
+	}
 
 	for _, f := range targetFiles {
 
@@ -50,24 +62,4 @@ func main() {
 			fmt.Println(f, err)
 		}
 	}
-}
-
-// dirwalk は与えられたディレクトリ以下のファイルパスをリストで返します
-func dirwalk(dir string) []string {
-
-	// ディレクトリがなければ知らせて終了
-	if _, err := os.Stat(dir); err != nil {
-		fmt.Printf("%v\n", err)
-		os.Exit(1)
-	}
-
-	var paths []string
-	for _, file := range files {
-		if file.IsDir() {
-			paths = append(paths, dirwalk(filepath.Join(dir, file.Name()))...)
-			continue
-		}
-		paths = append(paths, filepath.Join(dir, file.Name()))
-	}
-	return paths
 }
