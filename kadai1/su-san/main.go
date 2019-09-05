@@ -51,7 +51,7 @@ func main() {
 	})
 
 	if err != nil {
-		fmt.Println("file open error")
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
@@ -59,7 +59,7 @@ func main() {
 
 		err := image.FmtConv(f, convExts)
 		if err != nil {
-			fmt.Println(f, err)
+			fmt.Fprintln(os.Stderr, err, " error filepath:", f)
 			os.Exit(1)
 		}
 	}
