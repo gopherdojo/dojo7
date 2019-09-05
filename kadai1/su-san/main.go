@@ -52,7 +52,7 @@ func main() {
 
 	if err != nil {
 		fmt.Println("file open error")
-		return
+		os.Exit(1)
 	}
 
 	for _, f := range targetFiles {
@@ -60,6 +60,7 @@ func main() {
 		err := image.FmtConv(f, convExts)
 		if err != nil {
 			fmt.Println(f, err)
+			os.Exit(1)
 		}
 	}
 }
