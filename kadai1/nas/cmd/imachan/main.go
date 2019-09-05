@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"path/filepath"
 
 	"github.com/gopherdojo/dojo7/kadai1/nas/pkg/imachan"
 )
@@ -23,11 +22,11 @@ func run() error {
 		err := fmt.Errorf("no target")
 		return err
 	}
-	path, err := filepath.Abs(args[0])
+	c, err := imachan.NewConfig(args[0], "jpeg", "png")
 	if err != nil {
 		return err
 	}
-	err = imachan.Convert(path, "jpg", "png")
+	err = c.Run()
 	if err != nil {
 		return err
 	}
