@@ -3,7 +3,7 @@ package imachan
 import (
 	"fmt"
 	"image"
-	_ "image/jpeg" // to convert jpeg file
+	"image/jpeg"
 	"image/png"
 	"os"
 	"path/filepath"
@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	jpegFormat = iota
+	jpgFormat = iota
 	pngFormat
 )
 
@@ -47,15 +47,14 @@ func NewConfig(dir, fromFormatStr, toFormatStr string) (*Config, error) {
 
 // Run is ...
 func (c *Config) Run() error {
-	err := filepath.Walk(c.Path, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(c.Path, func(target string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}
-		pathFormat := getImageFormat(strings.Replace(filepath.Ext(path), ".", "", 1))
-		if pathFormat != c.fromFormat {
+		if targetFormat := getImageFormat(strings.Replace(filepath.Ext(target), ".", "", 1)); targetFormat != c.fromFormat {
 			return nil
 		}
-		err = convert(path, c.fromFormat, c.toFormat)
+		err = convert(target, c.toFormat)
 		if err != nil {
 			return err
 		}
@@ -70,7 +69,7 @@ func (c *Config) Run() error {
 func getImageFormat(formatStr string) int {
 	switch formatStr {
 	case "jpg", "jpeg":
-		return jpegFormat
+		return jpgFormat
 	case "png":
 		return pngFormat
 	default:
@@ -78,22 +77,61 @@ func getImageFormat(formatStr string) int {
 	}
 }
 
-func convert(fromPath string, fromFormat, toFormat int) error {
-	f, err := os.Open(fromPath)
-	if err != nil {
-		return err
+func convert(fromPath string, toFormat int) error {
+	switch toFormat {
+	case pngFormat:
+		convertToPng(fromPath)
+	case jpgFormat:
+		convertToJpg(fromPath)
 	}
-	defer f.Close()
-	fromImg, _, err := image.Decode(f)
-	if err != nil {
-		return err
-	}
-	toPath := fromPath[0:len(fromPath)-len(filepath.Ext(fromPath))] + ".png"
-	toImg, err := os.Create(toPath)
-	err = png.Encode(toImg, fromImg)
+	toPath, err := convertToPng(fromPath)
 	if err != nil {
 		return err
 	}
 	fmt.Println("success:", fromPath, "->", toPath)
 	return nil
+}
+
+func convertToPng(fromPath string) (string, error) {
+	f, err := os.Open(fromPath)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+	fromImg, _, err := image.Decode(f)
+	if err != nil {
+		return "", err
+	}
+	toPath := fromPath[0:len(fromPath)-len(filepath.Ext(fromPath))] + ".png"
+	toImg, err := os.Create(toPath)
+	if err != nil {
+		return "", err
+	}
+	err = png.Encode(toImg, fromImg)
+	if err != nil {
+		return "", err
+	}
+	return toPath, nil
+}
+
+func convertToJpg(fromPath string) (string, error) {
+	f, err := os.Open(fromPath)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+	fromImg, _, err := image.Decode(f)
+	if err != nil {
+		return "", err
+	}
+	toPath := fromPath[0:len(fromPath)-len(filepath.Ext(fromPath))] + ".jpg"
+	toImg, err := os.Create(toPath)
+	if err != nil {
+		return "", err
+	}
+	err = jpeg.Encode(toImg, fromImg, &jpeg.Options{Quality: 100})
+	if err != nil {
+		return "", err
+	}
+	return toPath, nil
 }
