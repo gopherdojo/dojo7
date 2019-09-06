@@ -26,7 +26,7 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	err = c.Run()
+	err = c.ConvertRec()
 	if err != nil {
 		return err
 	}

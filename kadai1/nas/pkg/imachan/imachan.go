@@ -45,8 +45,8 @@ func NewConfig(dir, fromFormatStr, toFormatStr string) (*Config, error) {
 	}, nil
 }
 
-// Run is ...
-func (c *Config) Run() error {
+// ConvertRec is ...
+func (c *Config) ConvertRec() error {
 	err := filepath.Walk(c.Path, func(target string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
