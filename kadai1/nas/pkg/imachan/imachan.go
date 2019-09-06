@@ -1,3 +1,16 @@
+/*Package imachan は画像変換のパッケージです。
+
+https://gopherdojo.connpass.com/event/142892/ にて出された課題です。
+https://github.com/gopherdojo/dojo7/kadai1/nas を確認してください。
+
+How to use
+
+	c := imachan.NewConfig(path, fromFormat, toFormat)
+	data, err :=c.ConvertRec()
+
+これで path 配下の対象画像形式のものだけが同ディレクトリに指定画像形式に変換されます。
+
+*/
 package imachan
 
 import (
@@ -11,31 +24,32 @@ import (
 	"strings"
 )
 
-// file formats
+// 画像形式を示す一意な定数です。
 const (
-	JpgFormat = iota
+	defaultFormat = 0
+	JpgFormat     = iota
 	PngFormat
 	GifFormat
 )
 
-// Config is ...
+// Config は 画像変換に必要な設定情報を格納します。
 type Config struct {
 	Path       string
 	FromFormat int
 	ToFormat   int
 }
 
-// ConvertedDataRepository is ...
+// ConvertedDataRepository は変換前後のイメージファイルパスを格納します。
 type ConvertedDataRepository []map[string]string
 
-// NewConfig is ...
+// NewConfig 構造体 Config を生成します。
 func NewConfig(path, fromFormatStr, toFormatStr string) (*Config, error) {
-	fromFormat := getImageFormat(fromFormatStr)
+	fromFormat := GetImageFormat(fromFormatStr)
 	if fromFormat == -1 {
 		err := fmt.Errorf("undefind %s file format, please choose another", fromFormatStr)
 		return nil, err
 	}
-	toFormat := getImageFormat(toFormatStr)
+	toFormat := GetImageFormat(toFormatStr)
 	if toFormat == -1 {
 		err := fmt.Errorf("undefind %s file format, please choose another", toFormatStr)
 		return nil, err
@@ -47,7 +61,7 @@ func NewConfig(path, fromFormatStr, toFormatStr string) (*Config, error) {
 	}, nil
 }
 
-// ConvertRec is ...
+// ConvertRec は設定をもとに再帰的に画像を変換します。
 func (c *Config) ConvertRec() (ConvertedDataRepository, error) {
 	var r ConvertedDataRepository
 	err := filepath.Walk(c.Path, func(fromPath string, info os.FileInfo, err error) error {
@@ -57,10 +71,10 @@ func (c *Config) ConvertRec() (ConvertedDataRepository, error) {
 		if info.IsDir() {
 			return nil
 		}
-		if targetFormat := getImageFormat(strings.Replace(filepath.Ext(fromPath), ".", "", 1)); targetFormat != c.FromFormat {
+		if targetFormat := GetImageFormat(strings.Replace(filepath.Ext(fromPath), ".", "", 1)); targetFormat != c.FromFormat {
 			return nil
 		}
-		toPath, err := convert(fromPath, c.ToFormat)
+		toPath, err := Convert(fromPath, c.ToFormat)
 		if err != nil {
 			return err
 		}
@@ -76,7 +90,8 @@ func (c *Config) ConvertRec() (ConvertedDataRepository, error) {
 	return r, nil
 }
 
-func getImageFormat(formatStr string) int {
+// GetImageFormat は画像形式を一意に特定します。
+func GetImageFormat(formatStr string) int {
 	switch formatStr {
 	case "jpg", "jpeg":
 		return JpgFormat
@@ -92,17 +107,18 @@ func getImageFormat(formatStr string) int {
 	}
 }
 
-func convert(fromPath string, toFormat int) (string, error) {
+// Convert は任意の形式に画像を変換します。
+func Convert(fromPath string, toFormat int) (string, error) {
 	var (
 		toPath string
 		err    error
 	)
 	switch toFormat {
 	case PngFormat:
-		toPath, err = convertToPng(fromPath)
+		toPath, err = ConvertToPng(fromPath)
 
 	case JpgFormat:
-		toPath, err = convertToJpg(fromPath)
+		toPath, err = ConvertToJpg(fromPath)
 
 	case GifFormat:
 		toPath, err = convertToGif(fromPath)
@@ -113,8 +129,9 @@ func convert(fromPath string, toFormat int) (string, error) {
 	return toPath, nil
 }
 
-func convertToPng(fromPath string) (string, error) {
-	fromImg, err := decodeImage(fromPath)
+// ConvertToPng は PNG に画像を変換します。
+func ConvertToPng(fromPath string) (string, error) {
+	fromImg, err := DecodeImage(fromPath)
 	if err != nil {
 		return "", err
 	}
@@ -130,8 +147,9 @@ func convertToPng(fromPath string) (string, error) {
 	return toPath, nil
 }
 
-func convertToJpg(fromPath string) (string, error) {
-	fromImg, err := decodeImage(fromPath)
+// ConvertToJpg は JPG に画像を変換します。
+func ConvertToJpg(fromPath string) (string, error) {
+	fromImg, err := DecodeImage(fromPath)
 	if err != nil {
 		return "", err
 	}
@@ -147,8 +165,9 @@ func convertToJpg(fromPath string) (string, error) {
 	return toPath, nil
 }
 
+// ConvertToGif は GIF に画像を変換します。
 func convertToGif(fromPath string) (string, error) {
-	fromImg, err := decodeImage(fromPath)
+	fromImg, err := DecodeImage(fromPath)
 	if err != nil {
 		return "", err
 	}
@@ -164,7 +183,8 @@ func convertToGif(fromPath string) (string, error) {
 	return toPath, nil
 }
 
-func decodeImage(path string) (image.Image, error) {
+// DecodeImage は画像をデコードします。
+func DecodeImage(path string) (image.Image, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
