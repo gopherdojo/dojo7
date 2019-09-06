@@ -3,31 +3,47 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
+	"os"
 	"path/filepath"
 
 	"github.com/gopherdojo/dojo7/kadai1/nas/pkg/imachan"
 )
 
+// exit codes
+const (
+	ExitCodeOK  = 0
+	ExitCodeErr = 10
+)
+
 func main() {
 	err := run()
 	if err != nil {
-		log.Fatal(err)
+		os.Exit(ExitCodeErr)
+		return
 	}
+	os.Exit(ExitCodeOK)
 }
 
 func run() error {
+	var (
+		fromFormat string
+		toFormat   string
+	)
+
+	flag.StringVar(&fromFormat, "from", "jpg", "convert target image format")
+	flag.StringVar(&toFormat, "to", "png", "converted image format")
 	flag.Parse()
-	args := flag.Args()
-	if len(args) < 1 {
+
+	arg := flag.Arg(0)
+	if arg == "" {
 		err := fmt.Errorf("no target")
 		return err
 	}
-	path, err := filepath.Abs(args[0])
+	path, err := filepath.Abs(arg)
 	if err != nil {
 		return err
 	}
-	c, err := imachan.NewConfig(path, "jpeg", "png")
+	c, err := imachan.NewConfig(path, fromFormat, toFormat)
 	if err != nil {
 		return err
 	}
