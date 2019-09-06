@@ -12,8 +12,20 @@ import (
 // exit codes
 const (
 	ExitCodeOK  = 0
-	ExitCodeErr = 10
+	ExitCodeErr = 3
 )
+
+var usage = `imachanは指定のディレクトリ配下の画像を変換する CLI ツールです。
+変換元の画像形式および変換先の画像形式を指定できます。
+
+Usage:
+  imachan [flags]
+
+Flags:
+  -d string   select target file or directory            (default: ./)
+  -f string   select extension of image converted from   (default: jpg)
+  -t string   select extension of image converted to     (default: png)
+`
 
 func main() {
 	err := run()
@@ -30,6 +42,10 @@ func run() error {
 		fromFormat string
 		toFormat   string
 	)
+
+	flag.Usage = func() {
+		fmt.Print(usage)
+	}
 
 	flag.StringVar(&dir, "d", ".", "target directory")
 	flag.StringVar(&fromFormat, "f", "jpg", "converted from")
