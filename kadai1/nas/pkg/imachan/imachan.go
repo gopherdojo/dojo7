@@ -49,6 +49,9 @@ func NewConfig(path, fromFormatStr, toFormatStr string) (*Config, error) {
 func (c *Config) ConvertRec() (ConvertedDataRepository, error) {
 	var r ConvertedDataRepository
 	err := filepath.Walk(c.Path, func(fromPath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
 		if info.IsDir() {
 			return nil
 		}
@@ -56,13 +59,13 @@ func (c *Config) ConvertRec() (ConvertedDataRepository, error) {
 			return nil
 		}
 		toPath, err := convert(fromPath, c.toFormat)
+		if err != nil {
+			return err
+		}
 		r = append(r, map[string]string{
 			"from": fromPath,
 			"to":   toPath,
 		})
-		if err != nil {
-			return err
-		}
 		return nil
 	})
 	if err != nil {
