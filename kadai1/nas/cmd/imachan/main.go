@@ -31,9 +31,12 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	err = c.ConvertRec()
+	data, err := c.ConvertRec()
 	if err != nil {
 		return err
+	}
+	for _, dd := range data {
+		fmt.Printf("success : %s -> %s\n", dd["to"], dd["from"])
 	}
 	return nil
 }

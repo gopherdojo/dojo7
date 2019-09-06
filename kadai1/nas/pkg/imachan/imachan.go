@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-// file type formats
+// file formats
 const (
 	JpgFormat = iota
 	PngFormat
@@ -22,6 +22,9 @@ type Config struct {
 	fromFormat int
 	toFormat   int
 }
+
+// ConvertedDataRepository is ...
+type ConvertedDataRepository []map[string]string
 
 // NewConfig is ...
 func NewConfig(path, fromFormatStr, toFormatStr string) (*Config, error) {
@@ -43,7 +46,8 @@ func NewConfig(path, fromFormatStr, toFormatStr string) (*Config, error) {
 }
 
 // ConvertRec is ...
-func (c *Config) ConvertRec() error {
+func (c *Config) ConvertRec() (ConvertedDataRepository, error) {
+	var r ConvertedDataRepository
 	err := filepath.Walk(c.Path, func(fromPath string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
@@ -52,16 +56,20 @@ func (c *Config) ConvertRec() error {
 			return nil
 		}
 		// TODO from to をためて渡すようにする ためた中に今から処理する対象があれば次へ
-		_, err = convert(fromPath, c.toFormat)
+		toPath, err := convert(fromPath, c.toFormat)
+		r = append(r, map[string]string{
+			"from": fromPath,
+			"to":   toPath,
+		})
 		if err != nil {
 			return err
 		}
 		return nil
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return r, nil
 }
 
 func getImageFormat(formatStr string) int {
