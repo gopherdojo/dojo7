@@ -1,14 +1,14 @@
 /*Package imachan は画像変換のパッケージです。
 
 https://gopherdojo.connpass.com/event/142892/ にて出された課題です。
-https://github.com/gopherdojo/dojo7/kadai1/nas を確認してください。
+https://github.com/gopherdojo/dojo7/tree/kadai1-nas/kadai1/nas を確認してください。
 
 How to use
 
 	c := imachan.NewConfig(path, fromFormat, toFormat)
 	data, err :=c.ConvertRec()
 
-これで path 配下の対象画像形式のものだけが同ディレクトリに指定画像形式に変換されます。
+この処理で path 配下の対象画像形式のものだけが同ディレクトリに指定画像形式に変換されます。
 
 */
 package imachan
@@ -26,7 +26,7 @@ import (
 
 // 画像形式を示す一意な定数です。
 const (
-	defaultFormat = 0
+	DefaultFormat = 0
 	JpgFormat     = iota
 	PngFormat
 	GifFormat
@@ -45,15 +45,17 @@ type ConvertedDataRepository []map[string]string
 // NewConfig 構造体 Config を生成します。
 func NewConfig(path, fromFormatStr, toFormatStr string) (*Config, error) {
 	fromFormat := GetImageFormat(fromFormatStr)
-	if fromFormat == -1 {
+	if fromFormat == DefaultFormat {
 		err := fmt.Errorf("undefind %s file format, please choose another", fromFormatStr)
 		return nil, err
 	}
+
 	toFormat := GetImageFormat(toFormatStr)
-	if toFormat == -1 {
+	if toFormat == DefaultFormat {
 		err := fmt.Errorf("undefind %s file format, please choose another", toFormatStr)
 		return nil, err
 	}
+
 	return &Config{
 		Path:       path,
 		FromFormat: fromFormat,
@@ -64,29 +66,37 @@ func NewConfig(path, fromFormatStr, toFormatStr string) (*Config, error) {
 // ConvertRec は設定をもとに再帰的に画像を変換します。
 func (c *Config) ConvertRec() (ConvertedDataRepository, error) {
 	var r ConvertedDataRepository
+
 	err := filepath.Walk(c.Path, func(fromPath string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
+
 		if info.IsDir() {
 			return nil
 		}
+
 		if targetFormat := GetImageFormat(strings.Replace(filepath.Ext(fromPath), ".", "", 1)); targetFormat != c.FromFormat {
 			return nil
 		}
+
 		toPath, err := Convert(fromPath, c.ToFormat)
 		if err != nil {
 			return err
 		}
+
 		r = append(r, map[string]string{
 			"from": fromPath,
 			"to":   toPath,
 		})
+
 		return nil
 	})
+
 	if err != nil {
 		return nil, err
 	}
+
 	return r, nil
 }
 
@@ -103,7 +113,7 @@ func GetImageFormat(formatStr string) int {
 		return GifFormat
 
 	default:
-		return -1
+		return DefaultFormat
 	}
 }
 
@@ -113,6 +123,7 @@ func Convert(fromPath string, toFormat int) (string, error) {
 		toPath string
 		err    error
 	)
+
 	switch toFormat {
 	case PngFormat:
 		toPath, err = ConvertToPng(fromPath)
@@ -123,9 +134,11 @@ func Convert(fromPath string, toFormat int) (string, error) {
 	case GifFormat:
 		toPath, err = convertToGif(fromPath)
 	}
+
 	if err != nil {
 		return "", err
 	}
+
 	return toPath, nil
 }
 
@@ -135,15 +148,19 @@ func ConvertToPng(fromPath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	toPath := fromPath[0:len(fromPath)-len(filepath.Ext(fromPath))] + ".png"
+
 	toImg, err := os.Create(toPath)
 	if err != nil {
 		return "", err
 	}
+
 	err = png.Encode(toImg, fromImg)
 	if err != nil {
 		return "", err
 	}
+
 	return toPath, nil
 }
 
@@ -153,15 +170,19 @@ func ConvertToJpg(fromPath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	toPath := fromPath[0:len(fromPath)-len(filepath.Ext(fromPath))] + ".jpg"
+
 	toImg, err := os.Create(toPath)
 	if err != nil {
 		return "", err
 	}
+
 	err = jpeg.Encode(toImg, fromImg, &jpeg.Options{Quality: 100})
 	if err != nil {
 		return "", err
 	}
+
 	return toPath, nil
 }
 
@@ -171,15 +192,19 @@ func convertToGif(fromPath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	toPath := fromPath[0:len(fromPath)-len(filepath.Ext(fromPath))] + ".gif"
+
 	toImg, err := os.Create(toPath)
 	if err != nil {
 		return "", err
 	}
+
 	err = gif.Encode(toImg, fromImg, &gif.Options{NumColors: 256})
 	if err != nil {
 		return "", err
 	}
+
 	return toPath, nil
 }
 
@@ -190,9 +215,11 @@ func DecodeImage(path string) (image.Image, error) {
 		return nil, err
 	}
 	defer f.Close()
+
 	image, _, err := image.Decode(f)
 	if err != nil {
 		return nil, err
 	}
+
 	return image, nil
 }
