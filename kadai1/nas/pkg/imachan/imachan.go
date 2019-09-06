@@ -10,9 +10,10 @@ import (
 	"strings"
 )
 
+// file type formats
 const (
-	jpgFormat = iota
-	pngFormat
+	JPGFORMAT = iota
+	PNGFORMAT
 )
 
 // Config is ...
@@ -47,14 +48,15 @@ func NewConfig(dir, fromFormatStr, toFormatStr string) (*Config, error) {
 
 // ConvertRec is ...
 func (c *Config) ConvertRec() error {
-	err := filepath.Walk(c.Path, func(target string, info os.FileInfo, err error) error {
+	err := filepath.Walk(c.Path, func(fromPath string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}
-		if targetFormat := getImageFormat(strings.Replace(filepath.Ext(target), ".", "", 1)); targetFormat != c.fromFormat {
+		if targetFormat := getImageFormat(strings.Replace(filepath.Ext(fromPath), ".", "", 1)); targetFormat != c.fromFormat {
 			return nil
 		}
-		err = convert(target, c.toFormat)
+		// TODO from to をためて渡すようにする ためた中に今から処理する対象があれば次へ
+		_, err = convert(fromPath, c.toFormat)
 		if err != nil {
 			return err
 		}
@@ -69,30 +71,29 @@ func (c *Config) ConvertRec() error {
 func getImageFormat(formatStr string) int {
 	switch formatStr {
 	case "jpg", "jpeg":
-		return jpgFormat
+		return JPGFORMAT
 	case "png":
-		return pngFormat
+		return PNGFORMAT
 	default:
 		return -1
 	}
 }
 
-func convert(fromPath string, toFormat int) error {
+func convert(fromPath string, toFormat int) (string, error) {
 	var (
 		toPath string
 		err    error
 	)
 	switch toFormat {
-	case pngFormat:
+	case PNGFORMAT:
 		toPath, err = convertToPng(fromPath)
-	case jpgFormat:
+	case JPGFORMAT:
 		toPath, err = convertToJpg(fromPath)
 	}
 	if err != nil {
-		return err
+		return "", err
 	}
-	fmt.Println("success:", fromPath, "->", toPath)
-	return nil
+	return toPath, nil
 }
 
 func convertToPng(fromPath string) (string, error) {
