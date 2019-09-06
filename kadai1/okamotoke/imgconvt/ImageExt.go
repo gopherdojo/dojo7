@@ -1,12 +1,14 @@
 package imgconvt
 
+// ImageExt is image extension
 type ImageExt string
 
+// Supported image extension
 const (
-	ImageExtJpg  ImageExt = ".jpg"
-	ImageExtJpeg          = ".jpeg"
-	ImageExtPng           = ".png"
-	ImageExtGif           = ".gif"
+	ImageExtJpg  ImageExt = ".jpg"  // jpg
+	ImageExtJpeg          = ".jpeg" // jepg
+	ImageExtPng           = ".png"  // png
+	ImageExtGif           = ".gif"  // gif
 )
 
 func (i ImageExt) string() string {

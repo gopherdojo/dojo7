@@ -13,9 +13,9 @@ import (
 
 // Conv has Path, FromExt and ToExt
 type Conv struct {
-	Path    string
-	FromExt string
-	ToExt   string
+	Path    string // image file path
+	FromExt string // image file extensiton that you want to convert from
+	ToExt   string // image file extensiton that you want to convert to
 }
 
 // ConvertImage convert image FromExt to ToExt
