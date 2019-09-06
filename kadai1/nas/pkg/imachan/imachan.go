@@ -12,8 +12,8 @@ import (
 
 // file type formats
 const (
-	JPGFORMAT = iota
-	PNGFORMAT
+	JpgFormat = iota
+	PngFormat
 )
 
 // Config is ...
@@ -71,9 +71,9 @@ func (c *Config) ConvertRec() error {
 func getImageFormat(formatStr string) int {
 	switch formatStr {
 	case "jpg", "jpeg":
-		return JPGFORMAT
+		return JpgFormat
 	case "png":
-		return PNGFORMAT
+		return PngFormat
 	default:
 		return -1
 	}
@@ -85,9 +85,9 @@ func convert(fromPath string, toFormat int) (string, error) {
 		err    error
 	)
 	switch toFormat {
-	case PNGFORMAT:
+	case PngFormat:
 		toPath, err = convertToPng(fromPath)
-	case JPGFORMAT:
+	case JpgFormat:
 		toPath, err = convertToJpg(fromPath)
 	}
 	if err != nil {
