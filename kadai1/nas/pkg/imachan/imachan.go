@@ -3,6 +3,7 @@ package imachan
 import (
 	"fmt"
 	"image"
+	"image/gif"
 	"image/jpeg"
 	"image/png"
 	"os"
@@ -14,13 +15,14 @@ import (
 const (
 	JpgFormat = iota
 	PngFormat
+	GifFormat
 )
 
 // Config is ...
 type Config struct {
 	Path       string
-	fromFormat int
-	toFormat   int
+	FromFormat int
+	ToFormat   int
 }
 
 // ConvertedDataRepository is ...
@@ -40,8 +42,8 @@ func NewConfig(path, fromFormatStr, toFormatStr string) (*Config, error) {
 	}
 	return &Config{
 		Path:       path,
-		fromFormat: fromFormat,
-		toFormat:   toFormat,
+		FromFormat: fromFormat,
+		ToFormat:   toFormat,
 	}, nil
 }
 
@@ -55,10 +57,10 @@ func (c *Config) ConvertRec() (ConvertedDataRepository, error) {
 		if info.IsDir() {
 			return nil
 		}
-		if targetFormat := getImageFormat(strings.Replace(filepath.Ext(fromPath), ".", "", 1)); targetFormat != c.fromFormat {
+		if targetFormat := getImageFormat(strings.Replace(filepath.Ext(fromPath), ".", "", 1)); targetFormat != c.FromFormat {
 			return nil
 		}
-		toPath, err := convert(fromPath, c.toFormat)
+		toPath, err := convert(fromPath, c.ToFormat)
 		if err != nil {
 			return err
 		}
@@ -78,8 +80,13 @@ func getImageFormat(formatStr string) int {
 	switch formatStr {
 	case "jpg", "jpeg":
 		return JpgFormat
+
 	case "png":
 		return PngFormat
+
+	case "gif":
+		return GifFormat
+
 	default:
 		return -1
 	}
@@ -93,8 +100,12 @@ func convert(fromPath string, toFormat int) (string, error) {
 	switch toFormat {
 	case PngFormat:
 		toPath, err = convertToPng(fromPath)
+
 	case JpgFormat:
 		toPath, err = convertToJpg(fromPath)
+
+	case GifFormat:
+		toPath, err = convertToGif(fromPath)
 	}
 	if err != nil {
 		return "", err
@@ -130,6 +141,23 @@ func convertToJpg(fromPath string) (string, error) {
 		return "", err
 	}
 	err = jpeg.Encode(toImg, fromImg, &jpeg.Options{Quality: 100})
+	if err != nil {
+		return "", err
+	}
+	return toPath, nil
+}
+
+func convertToGif(fromPath string) (string, error) {
+	fromImg, err := decodeImage(fromPath)
+	if err != nil {
+		return "", err
+	}
+	toPath := fromPath[0:len(fromPath)-len(filepath.Ext(fromPath))] + ".gif"
+	toImg, err := os.Create(toPath)
+	if err != nil {
+		return "", err
+	}
+	err = gif.Encode(toImg, fromImg, &gif.Options{NumColors: 256})
 	if err != nil {
 		return "", err
 	}
