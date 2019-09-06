@@ -78,13 +78,16 @@ func getImageFormat(formatStr string) int {
 }
 
 func convert(fromPath string, toFormat int) error {
+	var (
+		toPath string
+		err    error
+	)
 	switch toFormat {
 	case pngFormat:
-		convertToPng(fromPath)
+		toPath, err = convertToPng(fromPath)
 	case jpgFormat:
-		convertToJpg(fromPath)
+		toPath, err = convertToJpg(fromPath)
 	}
-	toPath, err := convertToPng(fromPath)
 	if err != nil {
 		return err
 	}
