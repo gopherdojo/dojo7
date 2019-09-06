@@ -52,7 +52,7 @@ func run() error {
 		return err
 	}
 	for _, dd := range data {
-		fmt.Printf("success : %s -> %s\n", dd["to"], dd["from"])
+		fmt.Printf("success : %s -> %s\n", dd["from"], dd["to"])
 	}
 	return nil
 }
