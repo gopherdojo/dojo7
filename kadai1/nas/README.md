@@ -69,4 +69,4 @@ success : path/to/github.com/gopherdojo/dojo7/kadai1/nas/testdata/sub/go3.jpg ->
 - [x] 自作パッケージと標準パッケージと準標準パッケージのみ使う
   - 準標準パッケージ：golang.org/x以下のパッケージ
 - [x] ユーザ定義型を作ってみる
-- [ ] GoDocを生成してみる
+- [x] GoDocを生成してみる
