@@ -24,11 +24,7 @@ type Config struct {
 }
 
 // NewConfig is ...
-func NewConfig(dir, fromFormatStr, toFormatStr string) (*Config, error) {
-	path, err := filepath.Abs(dir)
-	if err != nil {
-		return nil, err
-	}
+func NewConfig(path, fromFormatStr, toFormatStr string) (*Config, error) {
 	fromFormat := getImageFormat(fromFormatStr)
 	if fromFormat == -1 {
 		err := fmt.Errorf("undefind %s file format, please choose another", fromFormatStr)
