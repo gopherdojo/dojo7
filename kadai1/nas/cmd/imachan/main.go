@@ -26,20 +26,17 @@ func main() {
 
 func run() error {
 	var (
+		dir        string
 		fromFormat string
 		toFormat   string
 	)
 
-	flag.StringVar(&fromFormat, "from", "jpg", "convert target image format")
-	flag.StringVar(&toFormat, "to", "png", "converted image format")
+	flag.StringVar(&dir, "d", ".", "target directory")
+	flag.StringVar(&fromFormat, "f", "jpg", "converted from")
+	flag.StringVar(&toFormat, "t", "png", "converted to")
 	flag.Parse()
 
-	arg := flag.Arg(0)
-	if arg == "" {
-		err := fmt.Errorf("no target")
-		return err
-	}
-	path, err := filepath.Abs(arg)
+	path, err := filepath.Abs(dir)
 	if err != nil {
 		return err
 	}
