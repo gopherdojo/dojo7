@@ -76,6 +76,7 @@ func (c *Config) ConvertRec() (ConvertedDataRepository, error) {
 			return nil
 		}
 
+		// fromPath の画像形式を取得し、c.FromFormat と比較する
 		if targetFormat := GetImageFormat(strings.Replace(filepath.Ext(fromPath), ".", "", 1)); targetFormat != c.FromFormat {
 			return nil
 		}
@@ -149,6 +150,7 @@ func ConvertToPng(fromPath string) (string, error) {
 		return "", err
 	}
 
+	// fromPath の拡張子以前と結合する
 	toPath := fromPath[0:len(fromPath)-len(filepath.Ext(fromPath))] + ".png"
 
 	toImg, err := os.Create(toPath)
@@ -171,6 +173,7 @@ func ConvertToJpg(fromPath string) (string, error) {
 		return "", err
 	}
 
+	// fromPath の拡張子以前と結合する
 	toPath := fromPath[0:len(fromPath)-len(filepath.Ext(fromPath))] + ".jpg"
 
 	toImg, err := os.Create(toPath)
@@ -193,6 +196,7 @@ func convertToGif(fromPath string) (string, error) {
 		return "", err
 	}
 
+	// fromPath の拡張子以前と結合する
 	toPath := fromPath[0:len(fromPath)-len(filepath.Ext(fromPath))] + ".gif"
 
 	toImg, err := os.Create(toPath)
