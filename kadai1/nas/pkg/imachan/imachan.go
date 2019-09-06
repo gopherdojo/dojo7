@@ -96,12 +96,7 @@ func convert(fromPath string, toFormat int) error {
 }
 
 func convertToPng(fromPath string) (string, error) {
-	f, err := os.Open(fromPath)
-	if err != nil {
-		return "", err
-	}
-	defer f.Close()
-	fromImg, _, err := image.Decode(f)
+	fromImg, err := decodeImage(fromPath)
 	if err != nil {
 		return "", err
 	}
@@ -118,12 +113,7 @@ func convertToPng(fromPath string) (string, error) {
 }
 
 func convertToJpg(fromPath string) (string, error) {
-	f, err := os.Open(fromPath)
-	if err != nil {
-		return "", err
-	}
-	defer f.Close()
-	fromImg, _, err := image.Decode(f)
+	fromImg, err := decodeImage(fromPath)
 	if err != nil {
 		return "", err
 	}
@@ -137,4 +127,17 @@ func convertToJpg(fromPath string) (string, error) {
 		return "", err
 	}
 	return toPath, nil
+}
+
+func decodeImage(path string) (image.Image, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	image, _, err := image.Decode(f)
+	if err != nil {
+		return nil, err
+	}
+	return image, nil
 }
