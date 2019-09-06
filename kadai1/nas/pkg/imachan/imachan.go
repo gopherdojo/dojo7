@@ -55,7 +55,6 @@ func (c *Config) ConvertRec() (ConvertedDataRepository, error) {
 		if targetFormat := getImageFormat(strings.Replace(filepath.Ext(fromPath), ".", "", 1)); targetFormat != c.fromFormat {
 			return nil
 		}
-		// TODO from to をためて渡すようにする ためた中に今から処理する対象があれば次へ
 		toPath, err := convert(fromPath, c.toFormat)
 		r = append(r, map[string]string{
 			"from": fromPath,
