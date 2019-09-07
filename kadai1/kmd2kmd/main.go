@@ -45,6 +45,7 @@ func main() {
 	}
 
 	for _, v := range paths {
-		iconv.Convert(v, *out)
+		c := iconv.IConverter{Path: v, In: *in, Out: *out}
+		c.Convert()
 	}
 }
