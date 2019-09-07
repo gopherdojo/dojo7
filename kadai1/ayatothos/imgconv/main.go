@@ -38,7 +38,7 @@ func ConvertImageAll(dirPath, fromType, toType string) ([]string, error) {
 		return nil, errors.New("正しいディレクトリパスを指定してください")
 	}
 
-	fromExtentions, err := getExtentionsByName(fromType)
+	fromExtentions, err := GetExtentionsByName(fromType)
 	if err != nil {
 		return nil, err
 	}
@@ -109,11 +109,12 @@ func ConvertImage(srcPath, destPath, toType string) error {
 	return nil
 }
 
-func getExtentionsByName(fileType string) ([]string, error) {
+// GetExtentionsByName 拡張子の取得
+func GetExtentionsByName(fileType string) ([]string, error) {
 	for _, v := range validFileTypes {
 		if v.name == fileType {
 			return v.extentions, nil
 		}
 	}
-	return nil, errors.New("拡張子が取得できません")
+	return nil, errors.New("サポートしていない拡張子名です")
 }
