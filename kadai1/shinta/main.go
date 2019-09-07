@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gopherdojo/dojo7/kadai1/shinta/imageconversion/imageconversion"
+	"github.com/gopherdojo/dojo7/kadai1/shinta/imageconversion"
 )
 
 func main() {

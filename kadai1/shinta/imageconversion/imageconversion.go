@@ -64,7 +64,7 @@ func getFileNameWithoutExt(path string) string {
 	return filepath.Base(path[:len(path)-len(filepath.Ext(path))])
 }
 
-func createImgList(path string) (image imageFile) {
+func createImgStruct(path string) (image imageFile) {
 	base := getFileNameWithoutExt(path)
 	image = imageFile{filepath.Dir(path), base, filepath.Ext(path)}
 	return
@@ -86,12 +86,12 @@ func searchImages(dir string, preExt string) (list imageList, err error) {
 		if jpgFlag {
 			// jpeg は jpgも変換対象とする
 			if filepath.Ext(path) == ".jpeg" || filepath.Ext(path) == ".jpg" {
-				image := createImgList(path)
+				image := createImgStruct(path)
 				list = append(list, image)
 			}
 		} else {
 			if filepath.Ext(path) == preExt {
-				image := createImgList(path)
+				image := createImgStruct(path)
 				list = append(list, image)
 			}
 		}
@@ -116,7 +116,7 @@ func convetImages(list imageList, afterExt string) (err error) {
 		}
 
 		switch afterExt {
-		case "jpeg":
+		case "jpeg", "jpg":
 			jpeg.Encode(outputImg, readImg, nil)
 		case "gif":
 			gif.Encode(outputImg, readImg, nil)
