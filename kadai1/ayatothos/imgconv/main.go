@@ -19,7 +19,7 @@ type FileType struct {
 var validFileTypes = []FileType{
 	{
 		name:       "jpg",
-		extentions: []string{".jpg", ".jpg", ".JPG", ".JPEG"},
+		extentions: []string{".jpg", ".jpeg", ".JPG", ".JPEG"},
 	},
 	{
 		name:       "png",
