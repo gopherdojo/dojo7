@@ -1,3 +1,7 @@
+/*
+Imgconvt is a tool that can covnert images to another format under specified directory.
+*/
+
 package imgconvt
 
 import (
