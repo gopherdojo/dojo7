@@ -1,13 +1,12 @@
 package main
 
 import (
+	"asuke-yasukuni/replacer"
+	"asuke-yasukuni/validation"
 	"flag"
 	"log"
 	"os"
 	"path/filepath"
-
-	"dojo7/kadai1/asuke-yasukuni/replacer"
-	"dojo7/kadai1/asuke-yasukuni/validation"
 )
 
 var src = flag.String("src", "", "ファイルパス書いて")
