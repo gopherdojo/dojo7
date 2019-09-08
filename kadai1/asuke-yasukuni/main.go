@@ -1,3 +1,5 @@
+// This command recursively converts images.
+
 package main
 
 import (
