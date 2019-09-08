@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/waytkheming/golang/dojo7/kadai1/waytkheming/imageconv"
+	"github.com/waytkheming/godojo/dojo7/kadai1/waytkheming/imageconv"
 )
 
 var (
@@ -43,7 +43,6 @@ func (c *CLI) Run(args []string) int {
 		"output file extension (support: jpg/png/gif, default: png)")
 	flags.StringVar(&to, "t", "png",
 		"output file extension (support: jpg/png/gif, default: png)")
-	fmt.Println(args)
 	flags.Parse(args[1:])
 	path := flags.Arg(0)
 
