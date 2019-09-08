@@ -22,19 +22,24 @@ import (
 func judgeArgExt(preExt string, afterExt string) (err error) {
 	allowExtList := []string{"jpg", "jpeg", "png", "gif"}
 	argExtList := []string{preExt, afterExt}
-	var judgeExt bool
-	for i, argExt := range argExtList {
-		if i == len(argExtList)-1 {
-			judgeExt = false
+	var judgeExtFlag bool
+	for _, argExt := range argExtList {
+		// 変換前の拡張子の判定結果が正しい場合、フラグを初期化する。
+		if judgeExtFlag {
+			judgeExtFlag = false
 		}
+		// 拡張子が正しい拡張子か判定する。
 		for _, allowExt := range allowExtList {
 			if allowExt == argExt {
-				judgeExt = true
-				break
+				judgeExtFlag = true
 			}
 		}
+		// 拡張子判定結果が正しくない場合breakする。フラグはfalseになる。
+		if !judgeExtFlag {
+			break
+		}
 	}
-	if !judgeExt {
+	if !judgeExtFlag {
 		err = errors.New("指定できる拡張子:" + strings.Join(allowExtList, ","))
 	}
 	return
