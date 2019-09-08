@@ -19,3 +19,10 @@ These flags are optional. If you don't specify the from and to the defaults are 
 $ ./main directory -from png -to jpg
 
 ```
+
+### godoc
+```
+go get github.com/gopherdojo/dojo7/kadai1/okamotoke/imgconvt
+godoc -http=:6060
+http://localhost:6060/pkg/github.com/gopherdojo/dojo7/kadai1/okamotoke/imgconvt/
+```
