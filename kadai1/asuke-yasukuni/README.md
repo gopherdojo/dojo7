@@ -1,13 +1,15 @@
 ## dojo7 [課題１] 画像変換コマンドを作ろう
 
+全体的にシンプルな実装を心がけてみました。
+
+**仕様**
 - -src ディレクトリパス
 - -from 変換対象の拡張子
 - -to 変換先の拡張子
 
-実行例
+**実行例**
 ```bash
 ./imgreplacer -src ./testdata/ -from png -to jpg
-
 2019/09/09 00:26:22 [replace start]
 2019/09/09 00:26:22 [replace file]testdata/recursiondata/test-1.png -> jpg
 2019/09/09 00:26:22 [replace file]testdata/recursiondata/test-2.png -> jpg
@@ -48,3 +50,5 @@
 - GoDocを生成してみる
   - go moduleで実装してたので生成に少し苦労しました。
   - 最終的にjodo7リポジトリ自体をGOPATHのsrcディレクトリ以下に置いて生成しています。
+![pkg_dojo7_kadai1_asuke-yasukuni_replacer_](https://user-images.githubusercontent.com/36254193/64491494-0ad96680-d2a4-11e9-926f-42336b6eb1e1.png)
+![pkg_dojo7_kadai1_asuke-yasukuni_validation_](https://user-images.githubusercontent.com/36254193/64491495-0b71fd00-d2a4-11e9-97f5-43f0681f403e.png)
