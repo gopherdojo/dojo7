@@ -54,6 +54,31 @@ Links
     - [The Go image package](https://blog.golang.org/go-image-package#TOC_5.)
 
 
+Go doc
+--------------------------------------------------------------------------------
+
+```
+$ go doc github.com/gopherdojo/dojo7/kadai1/imura81gt/imgconv/img
+package img // import "github.com/gopherdojo/dojo7/kadai1/imura81gt/imgconv/img"
+
+func AllImageFiles(dirs []string) (files []string)
+func Convert(r io.Reader, w io.Writer, t string) error
+func ConvertAll(dirs []string, iType ImageType, oType ImageType) error
+func ExpectedImageFiles(files []string, iType ImageType) (f []string)
+func IsExpectedImage(path string, iType ImageType) bool
+func IsImage(path string) bool
+type ImageType struct{ ... }
+```
+
+OR
+
+```
+cd $(go env GOPATH)/src/github.com/gopherdojo/dojo7/kadai1/imura81gt/imgconv
+godoc -http=:8080
+```
+
+http://localhost:8080/pkg/github.com/gopherdojo/dojo7/kadai1/imura81gt/imgconv/img/
+
 Build
 --------------------------------------------------------------------------------
 
