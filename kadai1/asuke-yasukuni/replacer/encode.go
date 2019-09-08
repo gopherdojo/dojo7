@@ -1,3 +1,12 @@
+/*
+
+Replacer is a package that can convert to the specified image format (jpg, png) by generating File structure.
+
+Supported formats
+
+png,jpg
+
+*/
 package replacer
 
 import (
@@ -10,12 +19,14 @@ import (
 	"path/filepath"
 )
 
+// A structure that stores image files.
 type File struct {
 	Path    string
 	FromExt string
 	ToExt   string
 }
 
+// This method encodes an image file into jpg or png.
 func (f *File) Encode() error {
 	file, err := os.Open(f.Path)
 	if err != nil {
