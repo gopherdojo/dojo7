@@ -1,4 +1,11 @@
+/*
+このパッケージはImageconvパッケージを起動するためのパッケージになります。
+
+*/
+
 package cli
+
+// Package cli is run Image convert function
 
 import (
 	"flag"
@@ -36,13 +43,13 @@ func (c *CLI) Run(args []string) int {
 	flags := flag.NewFlagSet("convert", flag.ContinueOnError)
 	flags.SetOutput(c.errStream)
 	flags.StringVar(&from, "from", "jpg",
-		"input file extension (support: jpg/png/gif, default: jpg)")
+		"input file format (support: jpg/png/gif, default: jpg)")
 	flags.StringVar(&from, "f", "jpg",
-		"input file extension (support: jpg/png/gif, default: jpg)")
+		"input file format (support: jpg/png/gif, default: jpg)")
 	flags.StringVar(&to, "to", "png",
-		"output file extension (support: jpg/png/gif, default: png)")
+		"output file format (support: jpg/png/gif, default: png)")
 	flags.StringVar(&to, "t", "png",
-		"output file extension (support: jpg/png/gif, default: png)")
+		"output file format (support: jpg/png/gif, default: png)")
 	flags.Parse(args[1:])
 	path := flags.Arg(0)
 

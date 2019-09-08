@@ -1,3 +1,7 @@
+/*
+このパッケージは、画像ファイルをpng,jpg,gifからpng,jpg,gifへ変換する機能を持っています。
+
+*/
 package imageconv
 
 import (
@@ -11,6 +15,7 @@ import (
 	"sync"
 )
 
+// Converter -> Converter struct
 type Converter struct {
 	Path   string
 	Images []ImageFile
@@ -36,6 +41,7 @@ func (c *Converter) GetImages(q chan ImageFile, wg *sync.WaitGroup) {
 	}
 }
 
+//Convert -> Convert Image FIl
 func (c *Converter) Convert(i ImageFile) error {
 	file, err := os.Open(i.Path)
 	if err != nil {

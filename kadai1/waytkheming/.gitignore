@@ -16,7 +16,3 @@
 # vendor/
 
 testdata/
-*.jpg
-*.jpeg
-*.png
-*.gif
