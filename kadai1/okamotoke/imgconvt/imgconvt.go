@@ -57,7 +57,7 @@ func decode(path string, from string) (image.Image, error) {
 	case ImageExtGif:
 		return gif.Decode(file)
 	default:
-		return nil, fmt.Errorf("failed to decode image")
+		return nil, fmt.Errorf("image extension not supported %s", ImageExt(from))
 	}
 }
 
@@ -79,7 +79,7 @@ func encode(img image.Image, to string, name string) error {
 	case ImageExtGif:
 		return gif.Encode(w, img, nil)
 	default:
-		return fmt.Errorf("failed to decode image")
+		return fmt.Errorf("image extension not supported %s", ImageExt(to))
 	}
 
 }
