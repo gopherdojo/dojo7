@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 )
 
-func ConvertToPng(src string) error {
+func ToPng(src string) {
 	sf, err := os.Open(src)
 	if err != nil {
-		return err
+		os.Exit(1)
 	}
 	defer sf.Close()
 
@@ -20,7 +20,7 @@ func ConvertToPng(src string) error {
 		fmt.Println("画像を解析できませんでした")
 	}
 
-	savefile, err := os.Create(filepath.Dir(src) + "test.png")
+	savefile, err := os.Create(filepath.Base(src) + ".png")
 	if err != nil {
 		fmt.Println("保存するためのファイルが作成できませんでした。")
 		os.Exit(1)
@@ -28,5 +28,5 @@ func ConvertToPng(src string) error {
 	defer savefile.Close()
 
 	png.Encode(savefile, img)
-	return nil
+	return
 }
