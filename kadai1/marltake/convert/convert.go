@@ -57,17 +57,23 @@ func ParseTarget(target string) (src string, dest string, ok bool) {
 		"png": true,
 		"gif": true,
 	}
+	src, dest, ok = "", "", false
 	if len(targets) != 2 {
-		return "", "", false
+		return
 	}
 	if targets[0] == "" {
-		targets[0] = "Jpg"
+		src = "jpg"
+	} else {
+		src = targets[0]
 	}
 	if targets[1] == "" {
-		targets[1] = "png"
+		dest = "png"
+	} else {
+		dest = targets[1]
 	}
-	if targets[0] != targets[1] && allowedExt[targets[0]] && allowedExt[targets[1]] {
-		return targets[0], targets[1], true
+	if src != dest && allowedExt[src] && allowedExt[dest] {
+		ok = true
+		return
 	}
-	return "", "", false
+	return
 }
