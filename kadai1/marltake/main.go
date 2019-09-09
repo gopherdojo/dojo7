@@ -6,7 +6,7 @@ import (
 	"log"
 	"path/filepath"
 
-	"./convert"
+	"marltake/convert"
 )
 
 func main() {
