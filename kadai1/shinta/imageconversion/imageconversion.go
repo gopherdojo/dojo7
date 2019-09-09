@@ -61,12 +61,9 @@ func convertExec(path, afterExt string) error {
 	default:
 		png.Encode(outputImg, readImg)
 	}
-
 	err = targetImg.Close()
-	if err != nil {
-		return err
-	}
-	return outputImg.Close()
+	err = outputImg.Close()
+	return err
 }
 
 /*
@@ -89,10 +86,16 @@ func Excute(dir, preExt, afterExt string) error {
 		}
 		// jpeg は jpgも変換対象とする
 		if jpgType[afterExt] && (filepath.Ext(path) == ".jpeg" || filepath.Ext(path) == ".jpg") {
-			convertExec(path, afterExt)
+			err = convertExec(path, afterExt)
+			if err != nil {
+				return err
+			}
 		}
 		if filepath.Ext(path) == preExt {
-			convertExec(path, afterExt)
+			err = convertExec(path, afterExt)
+			if err != nil {
+				return err
+			}
 		}
 		return err
 	})
