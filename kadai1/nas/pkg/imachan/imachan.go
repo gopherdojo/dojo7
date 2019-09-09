@@ -101,6 +101,7 @@ func (c *Config) ConvertRec() (ConvertedDataRepository, error) {
 	return r, nil
 }
 
+// TODO: 大文字に対応
 // GetImageFormat は画像形式を一意に特定します。
 func GetImageFormat(formatStr string) int {
 	switch formatStr {
@@ -157,6 +158,7 @@ func ConvertToPng(fromPath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	// TODO: defer のエラー処理
 	defer toImg.Close()
 
 	err = png.Encode(toImg, fromImg)
@@ -181,6 +183,7 @@ func ConvertToJpg(fromPath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	// TODO: defer のエラー処理
 	defer toImg.Close()
 
 	err = jpeg.Encode(toImg, fromImg, &jpeg.Options{Quality: 100})
@@ -205,6 +208,7 @@ func convertToGif(fromPath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	// TODO: defer のエラー処理
 	defer toImg.Close()
 
 	err = gif.Encode(toImg, fromImg, &gif.Options{NumColors: 256})
