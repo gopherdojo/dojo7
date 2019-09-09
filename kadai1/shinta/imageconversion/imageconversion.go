@@ -7,59 +7,13 @@ option を指定しない場合、コマンドを実行するディレクトリ�
 package imageconversion
 
 import (
-	"errors"
-	"flag"
 	"image"
 	"image/gif"
 	"image/jpeg"
 	"image/png"
 	"os"
 	"path/filepath"
-	"strings"
 )
-
-// judgeArgExt は引数に設定された拡張子が変換可能なものか判別する
-func judgeArgExt(preExt string, afterExt string) (err error) {
-	allowExtList := []string{"jpg", "jpeg", "png", "gif"}
-	argExtList := []string{preExt, afterExt}
-	var judgeExtFlag bool
-	for _, argExt := range argExtList {
-		// 変換前の拡張子の判定結果が正しい場合、フラグを初期化する。
-		if judgeExtFlag {
-			judgeExtFlag = false
-		}
-		// 拡張子が正しい拡張子か判定する。
-		for _, allowExt := range allowExtList {
-			if allowExt == argExt {
-				judgeExtFlag = true
-			}
-		}
-		// 拡張子判定結果が正しくない場合breakする。フラグはfalseになる。
-		if !judgeExtFlag {
-			break
-		}
-	}
-	if !judgeExtFlag {
-		err = errors.New("指定できる拡張子:" + strings.Join(allowExtList, ","))
-	}
-	return
-}
-
-// passArgs は引数を受け取りその引数(ディレクトリ、変換前拡張子、変換後拡張子)が正しいか判別し、引数の値を返します。
-func passArgs() (dir string, preExt string, afterExt string, err error) {
-	d := flag.String("d", "./", "対象ディレクトリ")
-	p := flag.String("p", "jpg", "変換前拡張子")
-	a := flag.String("a", "png", "変換後拡張子")
-	flag.Parse()
-	dir, preExt, afterExt = *d, *p, *a
-	err = judgeArgExt(preExt, afterExt)
-	if err != nil {
-		return
-	}
-	preExt = "." + preExt
-	afterExt = "." + afterExt
-	return
-}
 
 // imageFile struct は変換対象の画像のpath(path)、拡張子を除いたファイル名(base)、拡張子(ext)を持っています。
 type imageFile struct {
@@ -84,7 +38,7 @@ func createImgStruct(path string) (image imageFile) {
 convertExec は画像ファイルを引数で指定された変換後の拡張子(defaultはpng)に変換した新しい画像ファイルを生成します。
 処理が成功するとnil、errorが起きた場合、errorを返します。
 */
-func convertExec(path string, afterExt string) (err error) {
+func convertExec(path, afterExt string) error {
 	img := createImgStruct(path)
 	targetImg, err := os.Open(img.path + "/" + img.base + img.ext)
 	if err != nil {
@@ -108,39 +62,11 @@ func convertExec(path string, afterExt string) (err error) {
 		png.Encode(outputImg, readImg)
 	}
 
-	targetImg.Close()
-	outputImg.Close()
-	return
-}
-
-/*
-convertImages は、引数で指定されたディレクトリ以下から引数で指定した変換前拡張子(defaultはjpg)のファイルを、
-変換後拡張子(defaultはpng)に変換した新しい画像ファイルを生成します。
-処理が成功するとnil、errorが起きた場合、errorを返します。
-*/
-func convertImages(dir string, preExt string, afterExt string) (err error) {
-	// 変換対象ファイルが jpeg or jpg かを確認する
-	jpgType := [2]string{".jpg", ".jpeg"}
-	var jpgFlag bool
-	for _, v := range jpgType {
-		if preExt == v {
-			jpgFlag = true
-		}
+	err = targetImg.Close()
+	if err != nil {
+		return err
 	}
-	err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		// jpeg は jpgも変換対象とする
-		if jpgFlag && filepath.Ext(path) == ".jpeg" || filepath.Ext(path) == ".jpg" {
-			convertExec(path, afterExt)
-		}
-		if filepath.Ext(path) == preExt {
-			convertExec(path, afterExt)
-		}
-		return nil
-	})
-	return
+	return outputImg.Close()
 }
 
 /*
@@ -150,12 +76,25 @@ Excute は画像変換処理を実行します。
 引数が指定されない場合はデフォルトの値が適用されます。
 引数で受け取ったディレクトリ以下の変換前拡張子のファイルを変換後拡張子に変換した新しいファイルを作成します。
 処理が成功の場合、nilをerrorが起きた場合はerrorを返します。
+引数で指定されたディレクトリ以下から引数で指定した変換前拡張子(defaultはjpg)のファイルを、
+変換後拡張子(defaultはpng)に変換した新しい画像ファイルを生成します。
+処理が成功するとnil、errorが起きた場合、errorを返します。
 */
-func Excute() error {
-	dir, preExt, afterExt, err := passArgs()
-	if err != nil {
+func Excute(dir, preExt, afterExt string) error {
+	// 変換対象ファイルが jpeg or jpg かを確認する
+	jpgType := map[string]bool{".jpg": true, ".jpeg": true}
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		// jpeg は jpgも変換対象とする
+		if jpgType[afterExt] && (filepath.Ext(path) == ".jpeg" || filepath.Ext(path) == ".jpg") {
+			convertExec(path, afterExt)
+		}
+		if filepath.Ext(path) == preExt {
+			convertExec(path, afterExt)
+		}
 		return err
-	}
-	err = convertImages(dir, preExt, afterExt)
+	})
 	return err
 }
