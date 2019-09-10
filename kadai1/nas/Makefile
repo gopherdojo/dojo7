@@ -1,7 +1,7 @@
 # CONST
 BINARYNAME=imachan
 
-export GO111MODULE=off
+export GO111MODULE=auto
 
 # command
 .PHONY: help
