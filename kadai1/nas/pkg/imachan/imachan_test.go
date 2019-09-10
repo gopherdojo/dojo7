@@ -62,3 +62,41 @@ func TestNewConfig(t *testing.T) {
 		})
 	}
 }
+
+func TestGetImageFormat(t *testing.T) {
+	tests := []struct {
+		name     string
+		format   string
+		expected int
+	}{
+		{
+			name:     "Jpg",
+			format:   "jpg",
+			expected: JpgFormat,
+		},
+		{
+			name:     "Png",
+			format:   "png",
+			expected: PngFormat,
+		},
+		{
+			name:     "Gif",
+			format:   "gif",
+			expected: GifFormat,
+		},
+		{
+			name:     "Default",
+			format:   "undefind",
+			expected: DefaultFormat,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual := GetImageFormat(tt.format)
+			if actual != tt.expected {
+				t.Errorf("GetImageFormat(%s) => %d, want %d", tt.format, actual, tt.expected)
+			}
+		})
+	}
+}
