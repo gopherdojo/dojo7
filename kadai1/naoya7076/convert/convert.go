@@ -6,7 +6,22 @@ import (
 	"image/png"
 	"os"
 	"path/filepath"
+	"strings"
 )
+
+var imageFormats = map[string]bool{
+	"jpg" : false,
+	"jpeg" : false,
+	"png" : false,
+	"gif" : false,
+}
+
+func changeFileExt(path string,ext string)string{
+	oldFilePath := filepath.Base(path)
+	changedExtFilePath := strings.Replace(oldFilePath,filepath.Ext(path),ext,1)
+	return changedExtFilePath
+}
+
 
 func ToPng(src string) {
 	sf, err := os.Open(src)
@@ -17,12 +32,13 @@ func ToPng(src string) {
 
 	img, err := jpeg.Decode(sf)
 	if err != nil {
-		fmt.Println("画像を解析できませんでした")
+		fmt.Fprintf(os.Stderr,"画像を解析できませんでした。",err)
 	}
 
-	savefile, err := os.Create(filepath.Base(src) + ".png")
+	newFilePath := changeFileExt(src,".png")
+	savefile, err := os.Create(newFilePath)
 	if err != nil {
-		fmt.Println("保存するためのファイルが作成できませんでした。")
+		fmt.Fprintf(os.Stderr,"保存するためのファイルが作成できませんでした。",err)
 		os.Exit(1)
 	}
 	defer savefile.Close()

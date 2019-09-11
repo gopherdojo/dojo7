@@ -3,13 +3,16 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/gopherdojo/dojo7/kadai1/naoya7076/convert"
 	"os"
 	"path/filepath"
+
+	"github.com/gopherdojo/dojo7/kadai1/naoya7076/convert"
 )
 
 var (
 	source = flag.String("s","./","指定したディレクトリ以下を再帰的に捜査します")
+	from = flag.String("f",".jpeg","指定した拡張子の画像を検索します")
+	dest = flag.String("d",".png","指定した拡張子の画像に変換します")
 )
 func main() {
 	flag.Parse()
