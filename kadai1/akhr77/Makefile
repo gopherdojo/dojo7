@@ -3,14 +3,13 @@ GOFMT=$(GOCMD) fmt
 GOVET=$(GOCMD) vet
 GOLINT=golint
 GOTEST=$(GOCMD) test
+BINARYNAME=bin/imgconv
 
-export GO111MODULE=on
+export GO111MODULE=off
 
-all:imgconv
-
-imgconv:
-	go build -o imgconv -v
-
+.PHONY: build
+build: ## go build
+	go build -o ${BINARYNAME} cmd/imgconv/main.go
 fmt:
 	${GOFMT} ./...
 	${GOVET} ./...

@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"image"
+	"image/gif"
 	"image/jpeg"
 	"image/png"
 	"io"
@@ -33,6 +34,8 @@ var (
 func (c *CLI) Run(args []string) int {
 	flags := flag.NewFlagSet(args[0], flag.ContinueOnError)
 	flags.SetOutput(c.ErrStream)
+	// todo: あとで消す
+	fmt.Println("Run開始")
 	// ショートオプション
 	flags.StringVar(&src, "s", "", "変換したい画像のファイルパスを指定")
 	flags.StringVar(&from, "f", "jpg", "変換前の画像形式を指定")
@@ -45,6 +48,13 @@ func (c *CLI) Run(args []string) int {
 	if err := flags.Parse(args[1:]); err != nil {
 		fmt.Fprintf(c.ErrStream, "解析処理でエラーになりました")
 		return ExitCodeError
+	}
+
+	if !supportFormat(from) {
+		fmt.Fprintf(c.ErrStream, "-fオポションで指定指定画像形式はサポートしていません")
+	}
+	if !supportFormat(to) {
+		fmt.Fprintf(c.ErrStream, "-tオポションで指定指定画像形式はサポートしていません")
 	}
 
 	err := walk(src, from, to)
@@ -96,19 +106,24 @@ func walk(root, beforeExt, afterExt string) error {
 	return nil
 }
 
+func supportFormat(extention string) bool {
+	var supportedFormats = map[string]bool{"jpg": true, "jpeg": true, "png": true, "gif": true}
+	_, ok := supportedFormats[extention]
+	return ok
+}
+
 func convert(src io.Reader, dest io.Writer, extention string) error {
 	img, _, err := image.Decode(src)
 	if err != nil {
 		return err
 	}
-
 	switch extention {
 	case "jpg", "jpeg":
 		err = jpeg.Encode(dest, img, nil)
 	case "png":
 		err = png.Encode(dest, img)
-	case "default":
-		err = fmt.Errorf("supportしていないformatです")
+	case "gif":
+		err = gif.Encode(dest, img, nil)
 	}
 	if err != nil {
 		return err
