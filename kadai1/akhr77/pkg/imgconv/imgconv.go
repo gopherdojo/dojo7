@@ -8,6 +8,7 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -32,10 +33,9 @@ var (
 
 // Run is implements function
 func (c *CLI) Run(args []string) int {
+	log.Printf("\x1b[33m%s\x1b[0m\n", "[imgconv start]")
 	flags := flag.NewFlagSet(args[0], flag.ContinueOnError)
 	flags.SetOutput(c.ErrStream)
-	// todo: あとで消す
-	fmt.Println("Run開始")
 	// ショートオプション
 	flags.StringVar(&src, "s", "", "変換したい画像のファイルパスを指定")
 	flags.StringVar(&from, "f", "jpg", "変換前の画像形式を指定")
@@ -62,6 +62,7 @@ func (c *CLI) Run(args []string) int {
 		return ExitCodeError
 	}
 
+	log.Printf("\x1b[33m%s\x1b[0m\n", "[imgconv end]")
 	return ExitCodeOK
 }
 
@@ -87,6 +88,7 @@ func walk(root, beforeExt, afterExt string) error {
 				return err
 			}
 
+			log.Printf("\x1b[33m%s%s -> %s\x1b[0m\n", "[replace file]", path, afterExt)
 			err = convert(src, dest, afterExt)
 			if err != nil {
 				// 変換処理に失敗した場合、不要なファイルが作成されてしまうため、削除する
