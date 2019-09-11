@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gopherdojo/dojo7/kadai1/shinta/imageconversion"
+	"github.com/gopherdojo/dojo7/kadai2/shinta/imageconversion"
 )
 
 // judgeArgExt は引数に設定された拡張子が変換可能なものか判別する
