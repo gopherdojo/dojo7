@@ -1,9 +1,56 @@
 package imachan
 
 import (
+	"image"
+	"image/jpeg"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
+
+const (
+	testdir  = "testdata"
+	keepfile = ".gitkeep"
+)
+
+func SetupTest(t *testing.T, path string) func() {
+	f, err := os.Create(path)
+	if err != nil {
+		t.Errorf("Setup Error : %v", err)
+	}
+	defer f.Close()
+
+	img := image.NewRGBA(image.Rect(0, 0, 100, 100))
+	if err := jpeg.Encode(f, img, &jpeg.Options{Quality: 100}); err != nil {
+		t.Errorf("Setup Error : %v", err)
+	}
+
+	return func() {
+		err = filepath.Walk(testdir, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if path == testdir {
+				return nil
+			}
+
+			if _, fn := filepath.Split(path); fn == keepfile {
+				return nil
+			}
+
+			if err := os.Remove(path); err != nil {
+				return err
+			}
+
+			return nil
+		})
+		if err != nil {
+			t.Errorf("Teardown Error : %v", err)
+		}
+	}
+}
 
 func TestNewConfig(t *testing.T) {
 	tests := []struct {
@@ -96,6 +143,55 @@ func TestGetImageFormat(t *testing.T) {
 			actual := GetImageFormat(tt.format)
 			if actual != tt.expected {
 				t.Errorf("GetImageFormat(%s) => %d, want %d", tt.format, actual, tt.expected)
+			}
+		})
+	}
+}
+
+func TestConvert(t *testing.T) {
+	tests := []struct {
+		name     string
+		file     string
+		path     string
+		format   int
+		expected string
+	}{
+		{
+			name:     "ToPng",
+			path:     filepath.Join(testdir, "test.png"),
+			format:   JpgFormat,
+			expected: filepath.Join(testdir, "test.jpg"),
+		},
+		{
+			name:     "ToJpg",
+			path:     filepath.Join(testdir, "test.jpg"),
+			format:   PngFormat,
+			expected: filepath.Join(testdir, "test.png"),
+		},
+		{
+			name:     "ToGif",
+			path:     filepath.Join(testdir, "test.png"),
+			format:   GifFormat,
+			expected: filepath.Join(testdir, "test.gif"),
+		},
+		{
+			name:     "Default",
+			path:     filepath.Join(testdir, "test.png"),
+			format:   DefaultFormat,
+			expected: "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			Teardown := SetupTest(t, tt.path)
+			defer Teardown()
+			actual, err := Convert(tt.path, tt.format)
+			if err != nil {
+				t.Errorf("Error : %s", err)
+			}
+			if actual != tt.expected {
+				t.Errorf("Convert(%s, %d) => %s, want : %s", tt.path, tt.format, actual, tt.expected)
 			}
 		})
 	}
