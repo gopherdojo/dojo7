@@ -238,3 +238,129 @@ func TestConvert(t *testing.T) {
 		})
 	}
 }
+
+func TestConvertToPng(t *testing.T) {
+	tests := []struct {
+		name        string
+		path        string
+		expected    string
+		setup       bool
+		errorexists bool
+	}{
+		{
+			name:        "Success",
+			path:        filepath.Join(testdir, "test.jpg"),
+			expected:    filepath.Join(testdir, "test.png"),
+			setup:       true,
+			errorexists: false,
+		},
+		{
+			name:        "Fail",
+			path:        "",
+			expected:    "",
+			setup:       false,
+			errorexists: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.setup {
+				Teardown := SetupTest(t, tt.path)
+				defer Teardown()
+			}
+
+			actual, err := ConvertToPng(tt.path)
+			if err != nil && !tt.errorexists {
+				t.Errorf("Error : %v", err)
+			}
+
+			if actual != tt.expected {
+				t.Errorf("ConvertToPng(%s) => %s, want : %s", tt.path, actual, tt.expected)
+			}
+		})
+	}
+}
+
+func TestConvertToJpg(t *testing.T) {
+	tests := []struct {
+		name        string
+		path        string
+		expected    string
+		setup       bool
+		errorexists bool
+	}{
+		{
+			name:        "Success",
+			path:        filepath.Join(testdir, "test.png"),
+			expected:    filepath.Join(testdir, "test.jpg"),
+			setup:       true,
+			errorexists: false,
+		},
+		{
+			name:        "Fail",
+			path:        "",
+			expected:    "",
+			setup:       false,
+			errorexists: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.setup {
+				Teardown := SetupTest(t, tt.path)
+				defer Teardown()
+			}
+
+			actual, err := ConvertToJpg(tt.path)
+			if err != nil && !tt.errorexists {
+				t.Errorf("Error : %v", err)
+			}
+
+			if actual != tt.expected {
+				t.Errorf("ConvertToPng(%s) => %s, want : %s", tt.path, actual, tt.expected)
+			}
+		})
+	}
+}
+
+func TestConvertToGif(t *testing.T) {
+	tests := []struct {
+		name        string
+		path        string
+		expected    string
+		setup       bool
+		errorexists bool
+	}{
+		{
+			name:        "Success",
+			path:        filepath.Join(testdir, "test.jpg"),
+			expected:    filepath.Join(testdir, "test.gif"),
+			setup:       true,
+			errorexists: false,
+		},
+		{
+			name:        "Fail",
+			path:        "",
+			expected:    "",
+			setup:       false,
+			errorexists: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.setup {
+				Teardown := SetupTest(t, tt.path)
+				defer Teardown()
+			}
+
+			actual, err := ConvertToGif(tt.path)
+			if err != nil && !tt.errorexists {
+				t.Errorf("Error : %v", err)
+			}
+
+			if actual != tt.expected {
+				t.Errorf("ConvertToPng(%s) => %s, want : %s", tt.path, actual, tt.expected)
+			}
+		})
+	}
+}
