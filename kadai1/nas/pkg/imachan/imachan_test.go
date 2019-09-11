@@ -5,6 +5,7 @@ import (
 	"image/jpeg"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -108,6 +109,47 @@ func TestNewConfig(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestConfigConvertRec(t *testing.T) {
+	tests := []struct {
+		name          string
+		path          string
+		fromFormatStr string
+		toFormatStr   string
+		expected      ConvertedDataRepository
+	}{
+		{
+			name:          "PngToJpg",
+			path:          filepath.Join(testdir, "test.png"),
+			fromFormatStr: "png",
+			toFormatStr:   "jpg",
+			expected: ConvertedDataRepository{
+				map[string]string{
+					"from": filepath.Join(testdir, "test.png"),
+					"to":   filepath.Join(testdir, "test.jpg"),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		Teardown := SetupTest(t, tt.path)
+		defer Teardown()
+		c, err := NewConfig(tt.path, tt.fromFormatStr, tt.toFormatStr)
+		if err != nil {
+			t.Errorf("Error : %v", err)
+		}
+
+		actual, err := c.ConvertRec()
+		if err != nil {
+			t.Errorf("Error : %v", err)
+		}
+
+		if !reflect.DeepEqual(actual, tt.expected) {
+			t.Errorf("c.ConvertRec() => %v, want %v", actual, tt.expected)
+		}
+	}
+
 }
 
 func TestGetImageFormat(t *testing.T) {
