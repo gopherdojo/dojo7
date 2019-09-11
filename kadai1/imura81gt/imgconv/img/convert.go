@@ -64,6 +64,13 @@ func ConvertAll(dirs []string, iType ImageType, oType ImageType) error {
 			}
 
 			w, err := os.Create(oPath)
+			defer func() error {
+				err = w.Close()
+				if err != nil {
+					return err
+				}
+				return nil
+			}()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
