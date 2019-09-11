@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-var imageFormats = map[string]bool{
+var imageExts = map[string]bool{
 	"jpg" : false,
 	"jpeg" : false,
 	"png" : false,
@@ -20,6 +20,11 @@ func changeFileExt(path string,ext string)string{
 	oldFilePath := filepath.Base(path)
 	changedExtFilePath := strings.Replace(oldFilePath,filepath.Ext(path),ext,1)
 	return changedExtFilePath
+}
+
+func isFormatSupported(ext string)bool{
+	_,ok := imageExts[ext]
+	return ok
 }
 
 
@@ -36,7 +41,7 @@ func ToPng(src string) {
 	}
 
 	newFilePath := changeFileExt(src,".png")
-	savefile, err := os.Create(newFilePath)
+	savefile, err := os.Create(newFilePath)//エラー処理する
 	if err != nil {
 		fmt.Fprintf(os.Stderr,"保存するためのファイルが作成できませんでした。",err)
 		os.Exit(1)

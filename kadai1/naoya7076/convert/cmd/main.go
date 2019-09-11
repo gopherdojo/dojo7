@@ -11,7 +11,7 @@ import (
 
 var (
 	source = flag.String("s","./","指定したディレクトリ以下を再帰的に捜査します")
-	from = flag.String("f",".jpeg","指定した拡張子の画像を検索します")
+	from = flag.String("f",".jpg","指定した拡張子の画像を検索します")
 	dest = flag.String("d",".png","指定した拡張子の画像に変換します")
 )
 func main() {
