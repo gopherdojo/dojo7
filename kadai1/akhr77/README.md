@@ -16,10 +16,11 @@
 ## Installation
 
 ```bash
-$  cd 
+$ make
 ```
 
 ## Usage
 ```bash
-
+$ cd bin
+$ ./imgconv -s ../testdata -f jpg -t png
 ```
