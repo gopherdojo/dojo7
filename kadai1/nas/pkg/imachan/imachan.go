@@ -134,7 +134,7 @@ func Convert(fromPath string, toFormat int) (string, error) {
 		toPath, err = ConvertToJpg(fromPath)
 
 	case GifFormat:
-		toPath, err = convertToGif(fromPath)
+		toPath, err = ConvertToGif(fromPath)
 	}
 
 	if err != nil {
@@ -195,7 +195,7 @@ func ConvertToJpg(fromPath string) (string, error) {
 }
 
 // ConvertToGif は GIF に画像を変換します。
-func convertToGif(fromPath string) (string, error) {
+func ConvertToGif(fromPath string) (string, error) {
 	fromImg, err := DecodeImage(fromPath)
 	if err != nil {
 		return "", err
