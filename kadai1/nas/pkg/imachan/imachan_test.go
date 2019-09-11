@@ -230,7 +230,7 @@ func TestConvert(t *testing.T) {
 			defer Teardown()
 			actual, err := Convert(tt.path, tt.format)
 			if err != nil {
-				t.Errorf("Error : %s", err)
+				t.Errorf("Error : %v", err)
 			}
 			if actual != tt.expected {
 				t.Errorf("Convert(%s, %d) => %s, want : %s", tt.path, tt.format, actual, tt.expected)
