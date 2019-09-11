@@ -131,23 +131,39 @@ func TestConfigConvertRec(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:          "UnmatchedFormat",
+			path:          filepath.Join(testdir, "test.png"),
+			fromFormatStr: "gif",
+			toFormatStr:   "jpg",
+			expected:      nil,
+		},
+		{
+			name:          "Directory",
+			path:          filepath.Join(testdir, "testtest"),
+			fromFormatStr: "gif",
+			toFormatStr:   "jpg",
+			expected:      nil,
+		},
 	}
 	for _, tt := range tests {
-		Teardown := SetupTest(t, tt.path)
-		defer Teardown()
-		c, err := NewConfig(tt.path, tt.fromFormatStr, tt.toFormatStr)
-		if err != nil {
-			t.Errorf("Error : %v", err)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			Teardown := SetupTest(t, tt.path)
+			defer Teardown()
+			c, err := NewConfig(tt.path, tt.fromFormatStr, tt.toFormatStr)
+			if err != nil {
+				t.Errorf("Error : %v", err)
+			}
 
-		actual, err := c.ConvertRec()
-		if err != nil {
-			t.Errorf("Error : %v", err)
-		}
+			actual, err := c.ConvertRec()
+			if err != nil {
+				t.Errorf("Error : %v", err)
+			}
 
-		if !reflect.DeepEqual(actual, tt.expected) {
-			t.Errorf("c.ConvertRec() => %v, want %v", actual, tt.expected)
-		}
+			if !reflect.DeepEqual(actual, tt.expected) {
+				t.Errorf("c.ConvertRec() => %v, want %v", actual, tt.expected)
+			}
+		})
 	}
 
 }
