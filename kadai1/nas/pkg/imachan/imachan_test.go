@@ -15,20 +15,29 @@ const (
 	keepfile = ".gitkeep"
 )
 
-func SetupTest(t *testing.T, path string) func() {
-	f, err := os.Create(path)
-	if err != nil {
-		t.Errorf("Setup Error : %v", err)
-	}
-	defer f.Close()
+func SetupTest(t *testing.T, path string, isDir bool) func() {
+	switch isDir {
+	case true:
+		err := os.Mkdir(path, os.ModePerm)
+		if err != nil {
+			t.Errorf("Setup Error : %v", err)
+		}
+	case false:
 
-	img := image.NewRGBA(image.Rect(0, 0, 100, 100))
-	if err := jpeg.Encode(f, img, &jpeg.Options{Quality: 100}); err != nil {
-		t.Errorf("Setup Error : %v", err)
+		f, err := os.Create(path)
+		if err != nil {
+			t.Errorf("Setup Error : %v", err)
+		}
+		defer f.Close()
+
+		img := image.NewRGBA(image.Rect(0, 0, 100, 100))
+		if err := jpeg.Encode(f, img, &jpeg.Options{Quality: 100}); err != nil {
+			t.Errorf("Setup Error : %v", err)
+		}
 	}
 
 	return func() {
-		err = filepath.Walk(testdir, func(path string, info os.FileInfo, err error) error {
+		err := filepath.Walk(testdir, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
@@ -118,6 +127,7 @@ func TestConfigConvertRec(t *testing.T) {
 		fromFormatStr string
 		toFormatStr   string
 		expected      ConvertedDataRepository
+		isdir         bool
 	}{
 		{
 			name:          "PngToJpg",
@@ -130,6 +140,7 @@ func TestConfigConvertRec(t *testing.T) {
 					"to":   filepath.Join(testdir, "test.jpg"),
 				},
 			},
+			isdir: false,
 		},
 		{
 			name:          "UnmatchedFormat",
@@ -137,18 +148,20 @@ func TestConfigConvertRec(t *testing.T) {
 			fromFormatStr: "gif",
 			toFormatStr:   "jpg",
 			expected:      nil,
+			isdir:         false,
 		},
 		{
 			name:          "Directory",
-			path:          filepath.Join(testdir, "testtest"),
+			path:          filepath.Join(testdir, "test"),
 			fromFormatStr: "gif",
 			toFormatStr:   "jpg",
 			expected:      nil,
+			isdir:         true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			Teardown := SetupTest(t, tt.path)
+			Teardown := SetupTest(t, tt.path, tt.isdir)
 			defer Teardown()
 			c, err := NewConfig(tt.path, tt.fromFormatStr, tt.toFormatStr)
 			if err != nil {
@@ -242,7 +255,7 @@ func TestConvert(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			Teardown := SetupTest(t, tt.path)
+			Teardown := SetupTest(t, tt.path, false)
 			defer Teardown()
 			actual, err := Convert(tt.path, tt.format)
 			if err != nil {
@@ -281,7 +294,7 @@ func TestConvertToPng(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.setup {
-				Teardown := SetupTest(t, tt.path)
+				Teardown := SetupTest(t, tt.path, false)
 				defer Teardown()
 			}
 
@@ -323,7 +336,7 @@ func TestConvertToJpg(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.setup {
-				Teardown := SetupTest(t, tt.path)
+				Teardown := SetupTest(t, tt.path, false)
 				defer Teardown()
 			}
 
@@ -365,7 +378,7 @@ func TestConvertToGif(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.setup {
-				Teardown := SetupTest(t, tt.path)
+				Teardown := SetupTest(t, tt.path, false)
 				defer Teardown()
 			}
 
