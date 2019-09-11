@@ -42,7 +42,10 @@ func (i ImageType) Enable() []string {
 
 // ConvertAll convert all image files in dirs
 func ConvertAll(dirs []string, iType ImageType, oType ImageType) error {
-	files := AllImageFiles(dirs)
+	files, err := AllImageFiles(dirs)
+	if err != nil {
+		return err
+	}
 	files = ExpectedImageFiles(files, iType)
 	fmt.Printf("%q\n", files)
 
@@ -54,13 +57,13 @@ func ConvertAll(dirs []string, iType ImageType, oType ImageType) error {
 			i, err := os.Open(iPath)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
+				return err
 			}
 
 			err = os.MkdirAll(filepath.Dir(oPath), 0755)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
+				return err
 			}
 
 			w, err := os.Create(oPath)
@@ -73,13 +76,13 @@ func ConvertAll(dirs []string, iType ImageType, oType ImageType) error {
 			}()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
+				return err
 			}
 
 			err = Convert(i, w, t)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
+				return err
 			}
 			oFiles = append(oFiles, oPath)
 		}
@@ -88,8 +91,9 @@ func ConvertAll(dirs []string, iType ImageType, oType ImageType) error {
 	return nil
 }
 
-func AllImageFiles(dirs []string) (files []string) {
+func AllImageFiles(dirs []string) ([]string, error) {
 	// 3. ディレクトリ以下は再帰的に処理する
+	var files []string
 	for _, dir := range dirs {
 		err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 			if info.IsDir() {
@@ -104,10 +108,10 @@ func AllImageFiles(dirs []string) (files []string) {
 		})
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+			return nil, err
 		}
 	}
-	return files
+	return files, nil
 }
 
 func ExpectedImageFiles(files []string, iType ImageType) (f []string) {
@@ -125,7 +129,7 @@ func IsImage(path string) bool {
 	r, err := os.Open(path)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return false
 	}
 	defer r.Close()
 
@@ -140,7 +144,7 @@ func IsExpectedImage(path string, iType ImageType) bool {
 	r, err := os.Open(path)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return false
 	}
 	defer r.Close()
 
