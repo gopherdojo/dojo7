@@ -34,6 +34,9 @@ func getFiles(root string, ext string) ([]string, error) {
 func main() {
 	flag.Parse()
 	flags := flag.Args()
+	if len(flags) < 1 {
+		os.Exit(1)
+	}
 
 	fmt.Println("convert", *in, "to", *out, "...")
 
@@ -45,7 +48,11 @@ func main() {
 	}
 
 	for _, v := range paths {
-		c := iconv.IConverter{Path: v, In: *in, Out: *out}
-		c.Convert()
+		c := iconv.Image{Path: v, In: *in, Out: *out}
+		err = c.Convert()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
+	os.Exit(0)
 }

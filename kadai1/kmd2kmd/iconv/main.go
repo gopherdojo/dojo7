@@ -1,6 +1,7 @@
 package iconv
 
 import (
+	"errors"
 	"image"
 	"image/jpeg"
 	"image/png"
@@ -9,40 +10,44 @@ import (
 	"path/filepath"
 )
 
-type IConverter struct {
+type Image struct {
 	Path string
 	In   string
 	Out  string
 }
 
 // jpegに変換し保存する｡Qualityは80で固定｡
-func convertToJpeg(img image.Image, dest string) {
+func convertToJpeg(img image.Image, dest string) error {
 
 	out, err := os.Create(dest)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer func() {
-		err := out.Close()
-		if err != nil {
-			log.Println("can't close"+dest, err)
+		deferErr := out.Close()
+		if deferErr != nil {
+			err = deferErr
 		}
 	}()
+	if err != nil {
+		return err
+	}
 
 	opts := &jpeg.Options{Quality: 80}
 
 	err = jpeg.Encode(out, img, opts)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }
 
 // pngに変換し保存する｡
-func convertToPng(img image.Image, dest string) {
+func convertToPng(img image.Image, dest string) error {
 
 	out, err := os.Create(dest)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer func() {
 		err := out.Close()
@@ -53,15 +58,16 @@ func convertToPng(img image.Image, dest string) {
 
 	err = png.Encode(out, img)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }
 
 // image.Imageをデコードする
-func getDecodedImage(path string) image.Image {
+func getDecodedImage(path string) (image.Image, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer func() {
 		err := file.Close()
@@ -72,9 +78,9 @@ func getDecodedImage(path string) image.Image {
 
 	img, _, err := image.Decode(file)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return img
+	return img, nil
 }
 
 // 拡張子を除いたファイルパスと取得する
@@ -85,16 +91,19 @@ func getFileNameWithoutExt(path string) string {
 }
 
 // イメージを変換し保存する
-func (c IConverter) Convert() {
-	img := getDecodedImage(c.Path)
+func (c Image) Convert() error {
+	img, err := getDecodedImage(c.Path)
+	if err != nil {
+		return err
+	}
 	dest := getFileNameWithoutExt(c.Path)
 
 	switch c.Out {
 	case "jpg":
-		convertToJpeg(img, dest+".jpg")
+		return convertToJpeg(img, dest+".jpg")
 	case "png":
-		convertToPng(img, dest+".png")
+		return convertToPng(img, dest+".png")
 	default:
-		log.Fatal("unsupported format")
+		return errors.New("unsupported format")
 	}
 }
