@@ -1,12 +1,11 @@
 package main
 
 import (
-	"asuke-yasukuni/replacer"
+	"asuke-yasukuni/command"
 	"asuke-yasukuni/validation"
 	"flag"
 	"log"
 	"os"
-	"path/filepath"
 )
 
 var src = flag.String("src", "", "ファイルパス書いて")
@@ -25,33 +24,15 @@ func main() {
 
 	log.Printf("\x1b[33m%s\x1b[0m\n", "[replace start]")
 
-	var file replacer.File
-	err := filepath.Walk(*src, func(path string, info os.FileInfo, err error) error {
-
-		if filepath.Ext(path) != "."+fromExt {
-			return nil
-		}
-
-		log.Printf("\x1b[33m%s%s -> %s\x1b[0m\n", "[replace file]", path, toExt)
-
-		file = replacer.File{
-			Path:    path,
-			FromExt: fromExt,
-			ToExt:   toExt,
-		}
-
-		if err := file.Encode(); err != nil {
-			return err
-		}
-
-		return nil
-	})
-
+	files,err := command.WalkEncoder(src, fromExt, toExt)
 	if err != nil {
 		log.Fatal(err)
+		os.Exit(1)
 	}
 
+	for _,f := range files {
+		log.Print(f)
+	}
+	
 	log.Printf("\x1b[33m%s\x1b[0m\n", "[replace end]")
-
-	os.Exit(1)
 }
