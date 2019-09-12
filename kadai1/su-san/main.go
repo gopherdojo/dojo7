@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	//"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -37,12 +36,12 @@ func main() {
 	}
 
 	convExts := image.NewConvExts(*inputExt, *outputExt)
-	if convExts.SupportedFormats() == false {
-		fmt.Println("unsupported format! please specify these format [png jpg jpeg gif]")
+	if !convExts.SupportedFormats() {
+		fmt.Fprintf(os.Stderr, "unsupported format! please specify these format [png jpg jpeg gif]")
 		return
 	}
 
-	targetFiles := []string{}
+	var targetFiles []string
 	err := filepath.Walk(targetDir, func(path string, info os.FileInfo, err error) error {
 		if filepath.Ext(path) == ("." + *inputExt) {
 			targetFiles = append(targetFiles, path)

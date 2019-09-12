@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 )
 
-var supportedFormats = map[string]int{"jpg": 1, "jpeg": 1, "png": 1, "gif": 1}
+var supportedFormats = map[string]bool{"jpg": true, "jpeg": true, "png": true, "gif": true}
 
 func supportedFormat(ext string) bool {
 	_, ok := supportedFormats[ext]
@@ -23,7 +23,7 @@ type ConvExts struct {
 }
 
 // SupportedFormats は指定フォーマットが対応しているか確認するメソッドです
-func (c ConvExts) SupportedFormats() bool {
+func (c *ConvExts) SupportedFormats() bool {
 	return supportedFormat(c.inExt) && supportedFormat(c.outExt)
 }
 
@@ -40,7 +40,7 @@ func NewConvExts(in, out string) ConvExts {
 }
 
 // FmtConv は指定されたフォーマットからフォーマットへ変換する関数です
-func FmtConv(path string, exts ConvExts) (err error) {
+func FmtConv(path string, exts ConvExts) error {
 	pathWithoutExt := path[:len(path)-len(filepath.Ext(path))+1]
 	ext := filepath.Ext(path)[1:]
 
@@ -73,11 +73,12 @@ func FmtConv(path string, exts ConvExts) (err error) {
 	}
 
 	outputFile, err := os.Create(pathWithoutExt + exts.outExt)
-	defer outputFile.Close()
-
 	if err != nil {
 		return err
 	}
+	defer func() error {
+		return outputFile.Close()
+	}()
 
 	var encodeErr error
 	switch exts.outExt {
@@ -89,8 +90,10 @@ func FmtConv(path string, exts ConvExts) (err error) {
 		encodeErr = gif.Encode(outputFile, img, nil)
 	}
 
-	if encodeErr == nil {
-		err = os.Remove(path)
+	if encodeErr != nil{
+		return encodeErr
 	}
-	return encodeErr
+
+	return os.Remove(path)
+
 }
