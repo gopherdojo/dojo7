@@ -18,6 +18,7 @@ import (
 // Conv has Path, FromExt and ToExt
 type Conv struct {
 	Path    string // image file path
+	Dest    string // image destination directory
 	FromExt string // image file extensiton that you want to convert from
 	ToExt   string // image file extensiton that you want to convert to
 }
@@ -30,7 +31,7 @@ func ConvertImage(c *Conv) error {
 		return fmt.Errorf("failed to decode image of %s : %v", c.Path, err)
 	}
 
-	err = encode(img, c.ToExt, c.getFileName())
+	err = encode(img, c.ToExt, c.getFileName(), c.Dest)
 
 	if err != nil {
 		return fmt.Errorf("failed to encode image of %s : %v", c.Path, err)
@@ -65,9 +66,19 @@ func decode(path string, from string) (image.Image, error) {
 	}
 }
 
-func encode(img image.Image, to string, name string) error {
+func encode(img image.Image, to string, name string, dest string) error {
 
-	w, err := os.Create(createFileName(name, to))
+	err := createDir(dest)
+
+	if err != nil {
+		return err
+	}
+
+	fileName := createFilePath(name, to)
+	dir := filepath.Join(dest, fileName)
+	fileName = dir
+
+	w, err := os.Create(fileName)
 
 	if err != nil {
 		return fmt.Errorf("failed to create file")
@@ -79,15 +90,30 @@ func encode(img image.Image, to string, name string) error {
 	case ImageExtJpg, ImageExtJpeg:
 		return jpeg.Encode(w, img, nil)
 	case ImageExtPng:
-		return jpeg.Encode(w, img, nil)
+		return png.Encode(w, img)
 	case ImageExtGif:
 		return gif.Encode(w, img, nil)
 	default:
-		return fmt.Errorf("image extension not supported %s", ImageExt(to))
+		err := fmt.Errorf("image extension not supported %s", ImageExt(to))
+		os.Remove(fileName)
+		return err
 	}
-
 }
 
-func createFileName(name string, ext string) string {
+func createFilePath(name string, ext string) string {
 	return name + ext
+}
+
+func createDir(dest string) error {
+	if dest != "" {
+		if _, err := os.Stat(dest); os.IsNotExist(err) {
+			err := os.Mkdir(dest, os.ModePerm)
+
+			if err != nil {
+				return fmt.Errorf("failed to create directory")
+			}
+		}
+
+	}
+	return nil
 }

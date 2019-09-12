@@ -27,7 +27,7 @@ func main() {
 
 	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		if filepath.Ext(path) == addDot(*from) {
-			c := &imgconvt.Conv{path, addDot(*from), addDot(*to)}
+			c := &imgconvt.Conv{path, "", addDot(*from), addDot(*to)}
 			err = imgconvt.ConvertImage(c)
 			fmt.Println(path)
 			return err
