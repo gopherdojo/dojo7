@@ -44,7 +44,7 @@ func FmtConv(path string, exts ConvExts) error {
 	pathWithoutExt := path[:len(path)-len(filepath.Ext(path))+1]
 	ext := filepath.Ext(path)[1:]
 
-	// 別フォーマットのファイルはスルーする
+	// 別フォーマットのファイルもしくは拡張子がない場合はスルーする
 	if ext != exts.inExt {
 		return nil
 	}
