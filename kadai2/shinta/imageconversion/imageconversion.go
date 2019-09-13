@@ -7,13 +7,40 @@ option を指定しない場合、コマンドを実行するディレクトリ�
 package imageconversion
 
 import (
+	"errors"
 	"image"
 	"image/gif"
 	"image/jpeg"
 	"image/png"
 	"os"
 	"path/filepath"
+	"strings"
 )
+
+type arg struct {
+	dir      string
+	preExt   string
+	afterExt string
+}
+
+func (a *arg) valid() error {
+	if a.preExt == a.afterExt {
+		return errors.New("変換前と変換後で拡張子が同じです。")
+	}
+	allowExtList := []string{"jpg", "jpeg", "png", "gif"}
+	allowExtMap := map[string]bool{}
+	for _, ext := range allowExtList {
+		allowExtMap[ext] = true
+	}
+	if !allowExtMap[a.preExt] || !allowExtMap[a.afterExt] {
+		return errors.New("指定できる拡張子: " + strings.Join(allowExtList, ","))
+	}
+	return nil
+}
+
+func (a *arg) convertExt() {
+	a.preExt, a.afterExt = "."+a.preExt, "."+a.afterExt
+}
 
 // imageFile struct は変換対象の画像のpath(path)、拡張子を除いたファイル名(base)、拡張子(ext)を持っています。
 type imageFile struct {
@@ -54,9 +81,9 @@ func convertExec(path, afterExt string) error {
 	}
 
 	switch afterExt {
-	case "jpeg", "jpg":
+	case ".jpeg", ".jpg":
 		jpeg.Encode(outputImg, readImg, nil)
-	case "gif":
+	case ".gif":
 		gif.Encode(outputImg, readImg, nil)
 	default:
 		png.Encode(outputImg, readImg)
@@ -78,21 +105,17 @@ Excute は画像変換処理を実行します。
 処理が成功するとnil、errorが起きた場合、errorを返します。
 */
 func Excute(dir, preExt, afterExt string) error {
-	// 変換対象ファイルが jpeg or jpg かを確認する
-	jpgType := map[string]bool{".jpg": true, ".jpeg": true}
-	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+	arg := &arg{dir, preExt, afterExt}
+	if err := arg.valid(); err != nil {
+		return err
+	}
+	arg.convertExt()
+	err := filepath.Walk(arg.dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		// jpeg は jpgも変換対象とする
-		if jpgType[afterExt] && (filepath.Ext(path) == ".jpeg" || filepath.Ext(path) == ".jpg") {
-			err = convertExec(path, afterExt)
-			if err != nil {
-				return err
-			}
-		}
-		if filepath.Ext(path) == preExt {
-			err = convertExec(path, afterExt)
+		if filepath.Ext(path) == arg.preExt {
+			err = convertExec(path, arg.afterExt)
 			if err != nil {
 				return err
 			}
