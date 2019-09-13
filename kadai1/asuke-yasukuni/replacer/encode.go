@@ -1,12 +1,5 @@
-/*
-
-Replacer is a package that can convert to the specified image format (jpg, png) by generating File structure.
-
-Supported formats
-
-png,jpg
-
-*/
+// Replacer is a package that can convert to the specified image format (jpg, png) by generating File structure.
+// Supported formats png,jpg
 package replacer
 
 import (
@@ -39,12 +32,14 @@ func (f *File) Encode() error {
 		return err
 	}
 
+	// create output file
 	out, err := os.Create(f.Path[:len(f.Path)-len(filepath.Ext(f.Path))] + "." + f.ToExt)
 	if err != nil {
 		return err
 	}
 	defer fileClose(out)
 
+	// select encoder
 	switch f.ToExt {
 	case "jpg":
 		if err := jpeg.Encode(out, img, &jpeg.Options{Quality: 100}); err != nil {
@@ -58,6 +53,7 @@ func (f *File) Encode() error {
 		return fmt.Errorf("%s is unsupported extension", f.ToExt)
 	}
 
+	// delete original file
 	if err := os.Remove(f.Path); err != nil {
 		return err
 	}
