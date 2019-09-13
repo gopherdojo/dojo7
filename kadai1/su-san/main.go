@@ -37,7 +37,7 @@ func main() {
 
 	convExts := image.NewConvExts(*inputExt, *outputExt)
 	if !convExts.SupportedFormats() {
-		fmt.Fprintf(os.Stderr, "unsupported format! please specify these format [png jpg jpeg gif]")
+		fmt.Fprintf(os.Stderr, "unsupported format! please specify these format [png jpg jpeg gif]\n")
 		return
 	}
 
