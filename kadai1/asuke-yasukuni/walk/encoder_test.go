@@ -33,6 +33,7 @@ func TestWalkEncoder(t *testing.T) {
 	}
 
 	//todo: 現状だと png -> jpg ができないのでtestdate追加する
+	// todo: 実際にエンコードされてるかどうかはまだテスト出来てないのでそれもやる
 	testCases := []struct {
 		Name   string
 		From   string
