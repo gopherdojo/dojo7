@@ -1,17 +1,22 @@
 // Recursive image encoder command implementation.
-package command
+package walk
 
 import (
 	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/gopherdojo/dojo7/asuke-yasukuni/replacer"
 )
 
+type File interface {
+	Encode(path, toExt string) error
+}
+
+type Walk struct {
+	File File
+}
+
 // Recursively search the directory and perform encoding.
-func WalkEncoder(src *string, fromExt, toExt string) (encodeFiles []string, err error) {
-	var file replacer.File
+func (w *Walk) Encoder(src *string, fromExt, toExt string) (encodeFiles []string, err error) {
 	err = filepath.Walk(*src, func(path string, info os.FileInfo, err error) error {
 		if filepath.Ext(path) != "."+fromExt {
 			return nil
@@ -20,12 +25,7 @@ func WalkEncoder(src *string, fromExt, toExt string) (encodeFiles []string, err 
 		// Use to output.
 		encodeFiles = append(encodeFiles, fmt.Sprintf("%s%s -> %s", "[replace file]", path, toExt))
 
-		file = replacer.File{
-			Path:    path,
-			FromExt: fromExt,
-			ToExt:   toExt,
-		}
-		if err := file.Encode(); err != nil {
+		if err := w.File.Encode(path, toExt); err != nil {
 			return err
 		}
 

@@ -13,15 +13,11 @@ import (
 )
 
 // A structure that stores image files.
-type File struct {
-	Path    string
-	FromExt string
-	ToExt   string
-}
+type File struct{}
 
 // This method encodes an image file into jpg or png.
-func (f *File) Encode() error {
-	file, err := os.Open(f.Path)
+func (f *File) Encode(path, to string) error {
+	file, err := os.Open(path)
 	if err != nil {
 		return err
 	}
@@ -33,14 +29,14 @@ func (f *File) Encode() error {
 	}
 
 	// create output file
-	out, err := os.Create(f.Path[:len(f.Path)-len(filepath.Ext(f.Path))] + "." + f.ToExt)
+	out, err := os.Create(path[:len(path)-len(filepath.Ext(path))] + "." + to)
 	if err != nil {
 		return err
 	}
 	defer fileClose(out)
 
 	// select encoder
-	switch f.ToExt {
+	switch to {
 	case "jpg":
 		if err := jpeg.Encode(out, img, &jpeg.Options{Quality: 100}); err != nil {
 			return err
@@ -50,11 +46,11 @@ func (f *File) Encode() error {
 			return err
 		}
 	default:
-		return fmt.Errorf("%s is unsupported extension", f.ToExt)
+		return fmt.Errorf("%s is unsupported extension", to)
 	}
 
 	// delete original file
-	if err := os.Remove(f.Path); err != nil {
+	if err := os.Remove(path); err != nil {
 		return err
 	}
 

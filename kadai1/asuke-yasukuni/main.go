@@ -4,8 +4,9 @@ import (
 	"flag"
 	"log"
 
-	"github.com/gopherdojo/dojo7/asuke-yasukuni/command"
+	"github.com/gopherdojo/dojo7/asuke-yasukuni/replacer"
 	"github.com/gopherdojo/dojo7/asuke-yasukuni/validation"
+	"github.com/gopherdojo/dojo7/asuke-yasukuni/walk"
 )
 
 var src = flag.String("src", "", "ファイルパス書いて")
@@ -22,7 +23,8 @@ func main() {
 
 	log.Printf("\x1b[33m%s\x1b[0m\n", "[replace start]")
 
-	files, err := command.WalkEncoder(src, *from, *to)
+	walker := walk.Walk{File: &replacer.File{}}
+	files, err := walker.Encoder(src, *from, *to)
 	if err != nil {
 		log.Fatal(err)
 	}
