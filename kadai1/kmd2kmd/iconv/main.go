@@ -52,7 +52,7 @@ func convertToPng(img image.Image, dest string) error {
 	defer func() {
 		err := out.Close()
 		if err != nil {
-			log.Println("can't close"+dest, err)
+			log.Println("failed close", dest, err)
 		}
 	}()
 
@@ -72,7 +72,7 @@ func getDecodedImage(path string) (image.Image, error) {
 	defer func() {
 		err := file.Close()
 		if err != nil {
-			log.Println("can't close"+path, err)
+			log.Println("failed close"+path, err)
 		}
 	}()
 
@@ -84,19 +84,25 @@ func getDecodedImage(path string) (image.Image, error) {
 }
 
 // 拡張子を除いたファイルパスと取得する
-func getFileNameWithoutExt(path string) string {
+func getFileNameWithoutExt(path string) (string, error) {
+	if path == "" {
+		return "", errors.New("an empty string was entered")
+	}
 	dir := filepath.Dir(path)
 	baseWithoutExt := filepath.Base(path[:len(path)-len(filepath.Ext(path))])
-	return filepath.Join(dir, baseWithoutExt)
+	return filepath.Join(dir, baseWithoutExt), nil
 }
 
 // イメージを変換し保存する
-func (c Image) Convert() error {
+func (c Image) Do() error {
 	img, err := getDecodedImage(c.Path)
 	if err != nil {
 		return err
 	}
-	dest := getFileNameWithoutExt(c.Path)
+	dest, err := getFileNameWithoutExt(c.Path)
+	if err != nil {
+		return err
+	}
 
 	switch c.Out {
 	case "jpg":

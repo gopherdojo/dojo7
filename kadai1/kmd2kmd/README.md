@@ -77,3 +77,7 @@ func Test(t *testing.T) {
 output関数は引数として､`io.Writer`を受け取り出力先として使用している｡  
 通常時は､`os.Stout`に出力されるがテスト時には､`bytes.Buffer`を渡す事で出力先が切り替わる｡  
 これによってテストが行い易くなる｡  
+
+## テスト
+
+[カバレッジ率](./cover.html)

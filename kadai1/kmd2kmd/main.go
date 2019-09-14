@@ -49,7 +49,7 @@ func main() {
 
 	for _, v := range paths {
 		c := iconv.Image{Path: v, In: *in, Out: *out}
-		err = c.Convert()
+		err = c.Do()
 		if err != nil {
 			log.Fatal(err)
 		}
