@@ -2,6 +2,8 @@ package convert
 
 import (
 	"fmt"
+	"image"
+	"image/gif"
 	"image/jpeg"
 	"image/png"
 	"os"
@@ -9,12 +11,14 @@ import (
 	"strings"
 )
 
-var imageExts = map[string]bool{
-	"jpg" : false,
-	"jpeg" : false,
-	"png" : false,
-	"gif" : false,
+var imageExtMap = map[string]bool{
+	".jpg" : true,
+	".jpeg" : true,
+	".png" : true,
+	".gif" : true,
 }
+
+
 
 func changeFileExt(path string,ext string)string{
 	oldFilePath := filepath.Base(path)
@@ -22,32 +26,66 @@ func changeFileExt(path string,ext string)string{
 	return changedExtFilePath
 }
 
-func isFormatSupported(ext string)bool{
-	_,ok := imageExts[ext]
+func IsFormatSupported(ext string)bool{
+	_, ok := imageExtMap[ext]
 	return ok
 }
 
 
-func ToPng(src string) {
+func Image(src string,oldExt string,newExt string) {
 	sf, err := os.Open(src)
 	if err != nil {
 		os.Exit(1)
 	}
 	defer sf.Close()
 
-	img, err := jpeg.Decode(sf)
-	if err != nil {
-		fmt.Fprintf(os.Stderr,"画像を解析できませんでした。",err)
+	var img image.Image
+	switch oldExt{
+	case ".jpeg","jpg":
+		img, err = jpeg.Decode(sf)
+		if err != nil {
+			fmt.Println("画像を解析できませんでした。",err)
+		}
+	case ".png":
+		img, err = png.Decode(sf)
+		if err != nil {
+			fmt.Println("画像を解析できませんでした。",err)
+		}
+	case ".gif":
+		img, err = gif.Decode(sf)
+		if err != nil {
+			fmt.Println("画像を解析できませんでした。",err)
+		}
 	}
 
-	newFilePath := changeFileExt(src,".png")
-	savefile, err := os.Create(newFilePath)//エラー処理する
+	newFilePath := changeFileExt(src,newExt)
+	var savefile *os.File
+	savefile, err = os.Create(newFilePath)
 	if err != nil {
-		fmt.Fprintf(os.Stderr,"保存するためのファイルが作成できませんでした。",err)
+		fmt.Println("保存するためのファイルが作成できませんでした。",err)
 		os.Exit(1)
 	}
 	defer savefile.Close()
 
-	png.Encode(savefile, img)
-	return
+	switch newExt {
+	case ".jpeg","jpg":
+		err = jpeg.Encode(savefile,img,nil)
+		if err != nil {
+			fmt.Println("ファイルをエンコードできませんでした。", err)
+			os.Exit(1)
+		}
+	case ".png":
+		err = png.Encode(savefile,img)
+		if err != nil {
+			fmt.Println("ファイルをエンコードできませんでした。",err)
+			os.Exit(1)
+		}
+	case ".gif":
+		fmt.Println(savefile)
+		err = gif.Encode(savefile,img,nil)
+		if err != nil {
+			fmt.Println("ファイルをエンコードできませんでした。", err)
+			os.Exit(1)
+		}
+	}
 }
