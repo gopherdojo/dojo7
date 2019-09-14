@@ -16,6 +16,7 @@ const (
 )
 
 func SetupTest(t *testing.T, path string, isDir bool) func() {
+	t.Helper()
 	switch isDir {
 	case true:
 		err := os.Mkdir(path, os.ModePerm)
