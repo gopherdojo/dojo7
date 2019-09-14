@@ -123,14 +123,17 @@ func TestNewConfig(t *testing.T) {
 func TestConfigConvertRec(t *testing.T) {
 	tests := []struct {
 		name          string
+		setupPath     string
 		path          string
 		fromFormatStr string
 		toFormatStr   string
 		expected      ConvertedDataRepository
-		isdir         bool
+		isDir         bool
+		errorExists   bool
 	}{
 		{
 			name:          "PngToJpg",
+			setupPath:     filepath.Join(testdir, "test.png"),
 			path:          filepath.Join(testdir, "test.png"),
 			fromFormatStr: "png",
 			toFormatStr:   "jpg",
@@ -140,28 +143,43 @@ func TestConfigConvertRec(t *testing.T) {
 					"to":   filepath.Join(testdir, "test.jpg"),
 				},
 			},
-			isdir: false,
+			isDir:       false,
+			errorExists: false,
 		},
 		{
 			name:          "UnmatchedFormat",
+			setupPath:     filepath.Join(testdir, "test.png"),
 			path:          filepath.Join(testdir, "test.png"),
 			fromFormatStr: "gif",
 			toFormatStr:   "jpg",
 			expected:      nil,
-			isdir:         false,
+			isDir:         false,
+			errorExists:   false,
 		},
 		{
 			name:          "Directory",
+			setupPath:     filepath.Join(testdir, "test"),
 			path:          filepath.Join(testdir, "test"),
 			fromFormatStr: "gif",
 			toFormatStr:   "jpg",
 			expected:      nil,
-			isdir:         true,
+			isDir:         true,
+			errorExists:   false,
+		},
+		{
+			name:          "FailConvert",
+			setupPath:     filepath.Join(testdir, "test.png"),
+			path:          "",
+			fromFormatStr: "png",
+			toFormatStr:   "jpg",
+			expected:      nil,
+			isDir:         false,
+			errorExists:   true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			Teardown := SetupTest(t, tt.path, tt.isdir)
+			Teardown := SetupTest(t, tt.setupPath, tt.isDir)
 			defer Teardown()
 			c, err := NewConfig(tt.path, tt.fromFormatStr, tt.toFormatStr)
 			if err != nil {
@@ -169,7 +187,7 @@ func TestConfigConvertRec(t *testing.T) {
 			}
 
 			actual, err := c.ConvertRec()
-			if err != nil {
+			if err != nil && !tt.errorExists {
 				t.Errorf("Error : %v", err)
 			}
 
@@ -221,48 +239,65 @@ func TestGetImageFormat(t *testing.T) {
 
 func TestConvert(t *testing.T) {
 	tests := []struct {
-		name     string
-		file     string
-		path     string
-		format   int
-		expected string
+		name        string
+		setupPath   string
+		fromPath    string
+		toFormat    int
+		expected    string
+		errorExists bool
 	}{
 		{
-			name:     "ToPng",
-			path:     filepath.Join(testdir, "test.png"),
-			format:   JpgFormat,
-			expected: filepath.Join(testdir, "test.jpg"),
+			name:        "toJpg",
+			setupPath:   filepath.Join(testdir, "test.png"),
+			fromPath:    filepath.Join(testdir, "test.png"),
+			toFormat:    JpgFormat,
+			expected:    filepath.Join(testdir, "test.jpg"),
+			errorExists: false,
 		},
 		{
-			name:     "ToJpg",
-			path:     filepath.Join(testdir, "test.jpg"),
-			format:   PngFormat,
-			expected: filepath.Join(testdir, "test.png"),
+			name:        "ToPng",
+			setupPath:   filepath.Join(testdir, "test.jpg"),
+			fromPath:    filepath.Join(testdir, "test.jpg"),
+			toFormat:    PngFormat,
+			expected:    filepath.Join(testdir, "test.png"),
+			errorExists: false,
 		},
 		{
-			name:     "ToGif",
-			path:     filepath.Join(testdir, "test.png"),
-			format:   GifFormat,
-			expected: filepath.Join(testdir, "test.gif"),
+			name:        "ToGif",
+			setupPath:   filepath.Join(testdir, "test.png"),
+			fromPath:    filepath.Join(testdir, "test.png"),
+			toFormat:    GifFormat,
+			expected:    filepath.Join(testdir, "test.gif"),
+			errorExists: false,
 		},
 		{
-			name:     "Default",
-			path:     filepath.Join(testdir, "test.png"),
-			format:   DefaultFormat,
-			expected: "",
+			name:        "Default",
+			setupPath:   filepath.Join(testdir, "test.png"),
+			fromPath:    filepath.Join(testdir, "test.png"),
+			toFormat:    DefaultFormat,
+			expected:    "",
+			errorExists: false,
+		},
+		{
+			name:        "ToJpgFail",
+			setupPath:   filepath.Join(testdir, "test.png"),
+			fromPath:    "",
+			toFormat:    JpgFormat,
+			expected:    "",
+			errorExists: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			Teardown := SetupTest(t, tt.path, false)
+			Teardown := SetupTest(t, tt.setupPath, false)
 			defer Teardown()
-			actual, err := Convert(tt.path, tt.format)
-			if err != nil {
+			actual, err := Convert(tt.fromPath, tt.toFormat)
+			if err != nil && !tt.errorExists {
 				t.Errorf("Error : %v", err)
 			}
 			if actual != tt.expected {
-				t.Errorf("Convert(%s, %d) => %s, want : %s", tt.path, tt.format, actual, tt.expected)
+				t.Errorf("Convert(%s, %d) => %s, want : %s", tt.fromPath, tt.toFormat, actual, tt.expected)
 			}
 		})
 	}
@@ -274,21 +309,21 @@ func TestConvertToPng(t *testing.T) {
 		path        string
 		expected    string
 		setup       bool
-		errorexists bool
+		errorExists bool
 	}{
 		{
 			name:        "Success",
 			path:        filepath.Join(testdir, "test.jpg"),
 			expected:    filepath.Join(testdir, "test.png"),
 			setup:       true,
-			errorexists: false,
+			errorExists: false,
 		},
 		{
 			name:        "Fail",
 			path:        "",
 			expected:    "",
 			setup:       false,
-			errorexists: true,
+			errorExists: true,
 		},
 	}
 	for _, tt := range tests {
@@ -299,7 +334,7 @@ func TestConvertToPng(t *testing.T) {
 			}
 
 			actual, err := ConvertToPng(tt.path)
-			if err != nil && !tt.errorexists {
+			if err != nil && !tt.errorExists {
 				t.Errorf("Error : %v", err)
 			}
 
@@ -316,21 +351,21 @@ func TestConvertToJpg(t *testing.T) {
 		path        string
 		expected    string
 		setup       bool
-		errorexists bool
+		errorExists bool
 	}{
 		{
 			name:        "Success",
 			path:        filepath.Join(testdir, "test.png"),
 			expected:    filepath.Join(testdir, "test.jpg"),
 			setup:       true,
-			errorexists: false,
+			errorExists: false,
 		},
 		{
 			name:        "Fail",
 			path:        "",
 			expected:    "",
 			setup:       false,
-			errorexists: true,
+			errorExists: true,
 		},
 	}
 	for _, tt := range tests {
@@ -341,7 +376,7 @@ func TestConvertToJpg(t *testing.T) {
 			}
 
 			actual, err := ConvertToJpg(tt.path)
-			if err != nil && !tt.errorexists {
+			if err != nil && !tt.errorExists {
 				t.Errorf("Error : %v", err)
 			}
 
@@ -358,21 +393,21 @@ func TestConvertToGif(t *testing.T) {
 		path        string
 		expected    string
 		setup       bool
-		errorexists bool
+		errorExists bool
 	}{
 		{
 			name:        "Success",
 			path:        filepath.Join(testdir, "test.jpg"),
 			expected:    filepath.Join(testdir, "test.gif"),
 			setup:       true,
-			errorexists: false,
+			errorExists: false,
 		},
 		{
 			name:        "Fail",
 			path:        "",
 			expected:    "",
 			setup:       false,
-			errorexists: true,
+			errorExists: true,
 		},
 	}
 	for _, tt := range tests {
@@ -383,7 +418,7 @@ func TestConvertToGif(t *testing.T) {
 			}
 
 			actual, err := ConvertToGif(tt.path)
-			if err != nil && !tt.errorexists {
+			if err != nil && !tt.errorExists {
 				t.Errorf("Error : %v", err)
 			}
 

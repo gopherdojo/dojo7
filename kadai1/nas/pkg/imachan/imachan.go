@@ -146,7 +146,13 @@ func Convert(fromPath string, toFormat int) (string, error) {
 
 // ConvertToPng は PNG に画像を変換します。
 func ConvertToPng(fromPath string) (string, error) {
-	fromImg, err := DecodeImage(fromPath)
+	f, err := os.Open(fromPath)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+
+	fromImg, _, err := image.Decode(f)
 	if err != nil {
 		return "", err
 	}
@@ -171,7 +177,13 @@ func ConvertToPng(fromPath string) (string, error) {
 
 // ConvertToJpg は JPG に画像を変換します。
 func ConvertToJpg(fromPath string) (string, error) {
-	fromImg, err := DecodeImage(fromPath)
+	f, err := os.Open(fromPath)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+
+	fromImg, _, err := image.Decode(f)
 	if err != nil {
 		return "", err
 	}
@@ -196,7 +208,13 @@ func ConvertToJpg(fromPath string) (string, error) {
 
 // ConvertToGif は GIF に画像を変換します。
 func ConvertToGif(fromPath string) (string, error) {
-	fromImg, err := DecodeImage(fromPath)
+	f, err := os.Open(fromPath)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+
+	fromImg, _, err := image.Decode(f)
 	if err != nil {
 		return "", err
 	}
@@ -217,20 +235,4 @@ func ConvertToGif(fromPath string) (string, error) {
 	}
 
 	return toPath, nil
-}
-
-// DecodeImage は画像をデコードします。
-func DecodeImage(path string) (image.Image, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	image, _, err := image.Decode(f)
-	if err != nil {
-		return nil, err
-	}
-
-	return image, nil
 }
