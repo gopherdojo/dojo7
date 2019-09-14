@@ -102,9 +102,8 @@ func (c *Config) ConvertRec() (ConvertedDataRepository, error) {
 }
 
 // GetImageFormat は画像形式を一意に特定します。
-// TODO: 大文字に対応
 func GetImageFormat(formatStr string) int {
-	switch formatStr {
+	switch strings.ToLower(formatStr) {
 	case "jpg", "jpeg":
 		return JpgFormat
 

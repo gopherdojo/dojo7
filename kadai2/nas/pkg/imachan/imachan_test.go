@@ -222,6 +222,11 @@ func TestGetImageFormat(t *testing.T) {
 			expected: GifFormat,
 		},
 		{
+			name:     "JpgUpperCase",
+			format:   "JPG",
+			expected: JpgFormat,
+		},
+		{
 			name:     "Default",
 			format:   "undefind",
 			expected: DefaultFormat,
