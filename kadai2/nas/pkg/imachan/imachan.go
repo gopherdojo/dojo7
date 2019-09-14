@@ -1,7 +1,7 @@
 /*Package imachan は画像変換のパッケージです。
 
 https://gopherdojo.connpass.com/event/142892/ にて出された課題です。
-https://github.com/gopherdojo/dojo7/tree/kadai1-nas/kadai1/nas を確認してください。
+https://github.com/gopherdojo/dojo7/tree/kadai2-nas/kadai2/nas を確認してください。
 
 How to use
 

@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/gopherdojo/dojo7/kadai1/nas/pkg/imachan"
+	"github.com/gopherdojo/dojo7/kadai2/nas/pkg/imachan"
 )
 
 // exit codes
