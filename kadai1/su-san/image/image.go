@@ -40,7 +40,7 @@ func NewConvExts(in, out string) ConvExts {
 }
 
 // FmtConv は指定されたフォーマットからフォーマットへ変換する関数です
-func FmtConv(path string, exts ConvExts) error {
+func FmtConv(path string, exts ConvExts) (err error) {
 	pathWithoutExt := path[:len(path)-len(filepath.Ext(path))+1]
 	ext := filepath.Ext(path)[1:]
 
@@ -50,7 +50,12 @@ func FmtConv(path string, exts ConvExts) error {
 	}
 
 	f, err := os.Open(path)
-	defer f.Close()
+	defer func() {
+		cerr := f.Close()
+		if err == nil {
+			err = cerr
+		}
+	}()
 
 	if err != nil {
 		return err
@@ -76,8 +81,11 @@ func FmtConv(path string, exts ConvExts) error {
 	if err != nil {
 		return err
 	}
-	defer func() error {
-		return outputFile.Close()
+	defer func() {
+		cerr := outputFile.Close()
+		if err == nil {
+			err = cerr
+		}
 	}()
 
 	var encodeErr error
@@ -90,10 +98,10 @@ func FmtConv(path string, exts ConvExts) error {
 		encodeErr = gif.Encode(outputFile, img, nil)
 	}
 
-	if encodeErr != nil{
+	if encodeErr != nil {
 		return encodeErr
 	}
 
-	return os.Remove(path)
-
+	err = os.Remove(path)
+	return
 }
