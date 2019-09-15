@@ -49,12 +49,17 @@ func TestWalkEncoder(t *testing.T) {
 	for _, tc := range testCase {
 		t.Run(tc.Name, func(t *testing.T) {
 			files, err := walker.Encoder(&src, tc.From, tc.To)
-			if err != nil {
-				t.Error(err)
-			}
-			if !reflect.DeepEqual(tc.Files, files) {
-				t.Fatal(files)
-			}
+			testDeepEqual(t, tc.Files, files, err)
 		})
+	}
+}
+
+func testDeepEqual(t *testing.T, tcFiles, files []string, err error) {
+	t.Helper()
+	if err != nil {
+		t.Error(err)
+	}
+	if !reflect.DeepEqual(tcFiles, files) {
+		t.Fatal(files)
 	}
 }
