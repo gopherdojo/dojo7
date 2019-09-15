@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/gopherdojo/dojo7/kadai1/su-san/image"
+	"github.com/gopherdojo/dojo7/kadai2/su-san/image"
 )
 
 func main() {
