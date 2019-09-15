@@ -29,7 +29,8 @@ func (f *File) Encode(path, to string) error {
 	}
 
 	// create output file
-	out, err := os.Create(path[:len(path)-len(filepath.Ext(path))] + "." + to)
+	outPath := path[:len(path)-len(filepath.Ext(path))] + "." + to
+	out, err := os.Create(outPath)
 	if err != nil {
 		return err
 	}
@@ -46,6 +47,10 @@ func (f *File) Encode(path, to string) error {
 			return err
 		}
 	default:
+		// delete fail file
+		if err := os.Remove(outPath); err != nil {
+			return err
+		}
 		return fmt.Errorf("%s is unsupported extension", to)
 	}
 
