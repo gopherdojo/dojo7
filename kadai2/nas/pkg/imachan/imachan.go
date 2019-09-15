@@ -163,8 +163,8 @@ func ConvertToPng(fromPath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer func() (string, error) {
-		return "", toImg.Close()
+	defer func() {
+		err = toImg.Close()
 	}()
 
 	err = png.Encode(toImg, fromImg)
@@ -195,8 +195,8 @@ func ConvertToJpg(fromPath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer func() (string, error) {
-		return "", toImg.Close()
+	defer func() {
+		err = toImg.Close()
 	}()
 
 	err = jpeg.Encode(toImg, fromImg, &jpeg.Options{Quality: 100})
@@ -227,8 +227,8 @@ func ConvertToGif(fromPath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer func() (string, error) {
-		return "", toImg.Close()
+	defer func() {
+		err = toImg.Close()
 	}()
 
 	err = gif.Encode(toImg, fromImg, &gif.Options{NumColors: 256})
