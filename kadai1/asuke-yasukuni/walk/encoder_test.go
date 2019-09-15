@@ -15,32 +15,34 @@ func TestWalkEncoder(t *testing.T) {
 
 	src := "../testdata/"
 
-	testFiles := []string{
-		"[replace file]../testdata/recursiondata/test-1.jpg -> png",
-		"[replace file]../testdata/recursiondata/test-2.jpg -> png",
-		"[replace file]../testdata/recursiondata/test-3.jpg -> png",
-		"[replace file]../testdata/recursiondata/test-4.jpg -> png",
-		"[replace file]../testdata/recursiondata/test-5.jpg -> png",
-		"[replace file]../testdata/recursiondata/test-6.jpg -> png",
-		"[replace file]../testdata/recursiondata/test-7.jpg -> png",
-		"[replace file]../testdata/test-1.jpg -> png",
-		"[replace file]../testdata/test-2.jpg -> png",
-		"[replace file]../testdata/test-3.jpg -> png",
-		"[replace file]../testdata/test-4.jpg -> png",
-		"[replace file]../testdata/test-5.jpg -> png",
-		"[replace file]../testdata/test-6.jpg -> png",
-		"[replace file]../testdata/test-7.jpg -> png",
-	}
-
-	//todo: 現状だと png -> jpg ができないのでtestdate追加する
-	// todo: 実際にエンコードされてるかどうかはまだテスト出来てないのでそれもやる
 	testCases := []struct {
-		Name   string
-		From   string
-		To     string
-		Result bool
+		Name  string
+		From  string
+		To    string
+		Files []string
 	}{
-		{Name: "walk jpg -> png", From: "jpg", To: "png"},
+		{
+			Name: "walk jpg -> png",
+			From: "jpg",
+			To:   "png",
+			Files: []string{
+				"[replace file]../testdata/recursiondata/test-1.jpg -> png",
+				"[replace file]../testdata/recursiondata/test-2.jpg -> png",
+				"[replace file]../testdata/test-1.jpg -> png",
+				"[replace file]../testdata/test-2.jpg -> png",
+			},
+		},
+		{
+			Name: "walk png -> jpg",
+			From: "png",
+			To:   "jpg",
+			Files: []string{
+				"[replace file]../testdata/recursiondata/test-1.png -> jpg",
+				"[replace file]../testdata/recursiondata/test-2.png -> jpg",
+				"[replace file]../testdata/test-1.png -> jpg",
+				"[replace file]../testdata/test-2.png -> jpg",
+			},
+		},
 	}
 
 	walker := Walk{File: &testFile{}}
@@ -50,7 +52,7 @@ func TestWalkEncoder(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			if !reflect.DeepEqual(testFiles, files) {
+			if !reflect.DeepEqual(tc.Files, files) {
 				t.Fatal(files)
 			}
 		})
