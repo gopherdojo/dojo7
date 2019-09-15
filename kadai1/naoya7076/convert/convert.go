@@ -20,9 +20,9 @@ var imageExtMap = map[string]bool{
 
 
 
-func changeFileExt(path string,ext string)string{
-	oldFilePath := filepath.Base(path)
-	changedExtFilePath := strings.Replace(oldFilePath,filepath.Ext(path),ext,1)
+func ChangeFileExt(path string,newExt string)string{
+	changedExtFilePath := strings.Replace(path,filepath.Ext(path),newExt,1)
+	fmt.Println(changedExtFilePath)
 	return changedExtFilePath
 }
 
@@ -57,32 +57,30 @@ func Image(src string,oldExt string,newExt string) {
 			fmt.Println("画像を解析できませんでした。",err)
 		}
 	}
-
-	newFilePath := changeFileExt(src,newExt)
-	var savefile *os.File
-	savefile, err = os.Create(newFilePath)
+	newFilePath := ChangeFileExt(src,newExt)
+	newFile, err := os.Create(newFilePath)
 	if err != nil {
 		fmt.Println("保存するためのファイルが作成できませんでした。",err)
 		os.Exit(1)
 	}
-	defer savefile.Close()
+	defer newFile.Close()
 
 	switch newExt {
 	case ".jpeg","jpg":
-		err = jpeg.Encode(savefile,img,nil)
+		err = jpeg.Encode(newFile,img,nil)
 		if err != nil {
 			fmt.Println("ファイルをエンコードできませんでした。", err)
 			os.Exit(1)
 		}
 	case ".png":
-		err = png.Encode(savefile,img)
+		err = png.Encode(newFile,img)
 		if err != nil {
 			fmt.Println("ファイルをエンコードできませんでした。",err)
 			os.Exit(1)
 		}
 	case ".gif":
-		fmt.Println(savefile)
-		err = gif.Encode(savefile,img,nil)
+		fmt.Println(newFile)
+		err = gif.Encode(newFile,img,nil)
 		if err != nil {
 			fmt.Println("ファイルをエンコードできませんでした。", err)
 			os.Exit(1)
