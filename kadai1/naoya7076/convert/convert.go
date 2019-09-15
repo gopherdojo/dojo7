@@ -22,7 +22,6 @@ var imageExtMap = map[string]bool{
 
 func ChangeFileExt(path string,newExt string)string{
 	changedExtFilePath := strings.Replace(path,filepath.Ext(path),newExt,1)
-	fmt.Println(changedExtFilePath)
 	return changedExtFilePath
 }
 
@@ -69,20 +68,19 @@ func Image(src string,oldExt string,newExt string) {
 	case ".jpeg","jpg":
 		err = jpeg.Encode(newFile,img,nil)
 		if err != nil {
-			fmt.Println("ファイルをエンコードできませんでした。", err)
+			fmt.Println("ファイルをエンコードできませんでした。")
 			os.Exit(1)
 		}
 	case ".png":
 		err = png.Encode(newFile,img)
 		if err != nil {
-			fmt.Println("ファイルをエンコードできませんでした。",err)
+			fmt.Println("ファイルをエンコードできませんでした。")
 			os.Exit(1)
 		}
 	case ".gif":
-		fmt.Println(newFile)
 		err = gif.Encode(newFile,img,nil)
 		if err != nil {
-			fmt.Println("ファイルをエンコードできませんでした。", err)
+			fmt.Println("ファイルをエンコードできませんでした。")
 			os.Exit(1)
 		}
 	}
