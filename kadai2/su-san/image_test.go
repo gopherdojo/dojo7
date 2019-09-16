@@ -1,4 +1,4 @@
-package image_test
+package image
 
 import (
 	"os"
@@ -83,7 +83,7 @@ func TestNewConvExts(t *testing.T) {
 }
 
 func TestFmtConv(t *testing.T) {
-
+	t.Helper()
 	// 前回作成したファイルは削除される
 	os.Remove("testdata/test_img/test_img1.png")
 
