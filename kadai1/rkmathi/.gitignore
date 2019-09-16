@@ -1,1 +1,4 @@
 tmp
+/internal/image/testdata/*
+!/internal/image/testdata/hoge.png
+!/internal/image/testdata/hoge.jpeg
