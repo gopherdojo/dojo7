@@ -1,4 +1,4 @@
-package image
+package image_test
 
 import (
 	"os"
