@@ -94,6 +94,11 @@ func TestIsImage(t *testing.T) {
 			path:     "../testdata/this_is_not_image.gif",
 			expected: false,
 		},
+		{
+			caseName: "does not existed.",
+			path:     "../testdata/does_not_existed.gif",
+			expected: false,
+		},
 	}
 
 	for _, tc := range testcases {
