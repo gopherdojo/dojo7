@@ -19,5 +19,14 @@
 - 呼び出し側はI/O処理がどんなことをしているのかを理解する必要が無い
 - DIPにできる。
 
+### test
+```
+// 通常のtest
+go test ./imageconversion
+```
 
-
+```
+// カバレッジつき
+go test -cover ./imageconversion
+go test -coverprofile=profile ./imageconversio
+```
