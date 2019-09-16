@@ -1,6 +1,7 @@
 package image
 
 import (
+	"os"
 	"testing"
 )
 
@@ -13,6 +14,7 @@ func TestSupportedFormat(t *testing.T){
 		{name: "gif", input: "gif", expected: true},
 		{name: "GIF", input: "GIF", expected: false},
 		{name: "no-ext", input: "", expected: false},
+		{name: "dotpng", input: ".png", expected: true},
 		{name: "mp4", input: "mp4", expected: false},
 	}
 
@@ -20,7 +22,7 @@ func TestSupportedFormat(t *testing.T){
 		c := c
 		t.Run(c.name, func(t *testing.T){
 			t.Parallel()
-			if actual := supportedFormat(c.input); c.expected != actual{
+			if actual := SupportedFormat(c.input); c.expected != actual{
 				t.Errorf(
 					"want supportedFormat(%s) = %v, got %v",
 					c.input, c.expected, actual)
@@ -81,5 +83,51 @@ func TestNewConvExts(t *testing.T) {
 }
 
 func TestFmtConv(t *testing.T) {
+
+	// 前回作成したファイルは削除される
+	os.Remove("testdata/test_img/test_img1.png")
+
+	type inputs struct {
+		path string;
+		convExts ConvExts
+	}
+	cases := []struct{name string; input inputs; expected string
+	}{
+		{
+			name: "jpeg-png",
+			input: inputs{path:"testdata/test_img_1.jpeg", convExts:ConvExts{"jpeg", "png"}},
+			expected: "testdata/test_img_1.png",
+		},
+		{
+			name: "png-gif",
+			input: inputs{path:"testdata/test_img_2.png", convExts:ConvExts{"png", "gif"}},
+			expected: "testdata/test_img_2.gif",
+		},
+		{
+			name: "gif-jpg",
+			input: inputs{path:"testdata/test_img_3.gif", convExts:ConvExts{"gif", "jpg"}},
+			expected: "testdata/test_img_3.jpg",
+		},
+	}
+
+	for _, c := range cases {
+		c := c
+		t.Run(c.name, func(t *testing.T){
+			t.Parallel()
+			// ファイルがある場合は削除する
+			os.Remove(c.expected)
+			f, err := os.Open(c.input.path)
+			if err != nil {
+				t.Errorf("cannnot open file: %v", c.input.path)
+			}
+			if err = FmtConv(f, c.input.convExts); err != nil {
+				t.Errorf("cannnot convert file: %v", c.input.path)
+			}
+			if _, err := os.Stat(c.expected); err != nil{
+				t.Errorf(
+					"convert failed %v", c.input.path)
+			}
+		})
+	}
 
 }
