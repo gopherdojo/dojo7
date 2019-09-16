@@ -41,3 +41,12 @@
 - テーブル駆動テストを行う
 - テストヘルパーを作ってみる
 
+## Answer
+
+### テスト実行
+
+```bash
+cd path/to/kadai2/ayatothos
+go test -v -coverprofile=cover.txt github.com/gopherdojo/dojo7/kadai2/ayatothos/imgconv
+go tool cover -html=cover.txt 
+```
