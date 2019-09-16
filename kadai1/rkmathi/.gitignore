@@ -2,3 +2,6 @@ tmp
 /internal/image/testdata/*
 !/internal/image/testdata/hoge.png
 !/internal/image/testdata/hoge.jpeg
+/internal/imageconv/testdata/*
+!/internal/imageconv/testdata/hoge.gif
+!/internal/imageconv/testdata/hoge.jpg
