@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/gopherdojo/dojo7/kadai1/okamotoke/imgconvt"
+	"github.com/gopherdojo/dojo7/kadai2/okamotoke/imgconvt"
 )
 
 func main() {
