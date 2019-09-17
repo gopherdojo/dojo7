@@ -41,7 +41,7 @@ http://localhost:6060/pkg/io/#Reader
 Q.io.Readerとio.Writerがあることで、どういう利点があるのか具体例を挙げて考えてみる
 --------------------------------------------------------------------------------
 
-たとえば画像を扱うことを考えてみる。
+(1) たとえば画像を扱うことを考えてみる。
 
 画像を "どこに" 出力するのかを考えると色んなパターンがある。
 
@@ -52,6 +52,12 @@ Q.io.Readerとio.Writerがあることで、どういう利点があるのか具
 
 image/png.decoder 等は出力先を意識せずに、io.Readerに準じた reader であれば処理を行えるから、便利。
 
+(2) たとえば画像のテストを書くことを考えてみる。
+
+画像ファイルを出力するようなプログラムでテストを書くときに
+実際にファイルを出力せずに buffer に出力する、とかができそう。
+
+
 
 
 【TRY】テストを書いてみよう
@@ -61,6 +67,7 @@ image/png.decoder 等は出力先を意識せずに、io.Readerに準じた read
 
 - [ ] テストのしやすさを考えてリファクタリングしてみる
 - [ ] テストのカバレッジを取ってみる
+    - https://blog.golang.org/cover
 - [ ] テーブル駆動テストを行う
 - [ ] テストヘルパーを作ってみる
 
@@ -69,3 +76,16 @@ image/png.decoder 等は出力先を意識せずに、io.Readerに準じた read
 
 
 
+```
+go test -v -race -cpu=2 -coverprofile=coverage.out  ./...
+```
+
+output coverage
+
+```
+go tool cover -func=coverage.out
+```
+
+```
+go tool cover -html=coverage.out
+```
