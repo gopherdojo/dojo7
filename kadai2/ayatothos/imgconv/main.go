@@ -48,13 +48,10 @@ func ConvertImageAll(dirPath, fromType, toType string) ([]string, error) {
 	err = filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
 		for _, v := range fromExtentions {
 			if ext := filepath.Ext(path); ext == v {
-				srcPath := dirPath + path
-				destPath := srcPath[:len(srcPath)-len(ext)] + "." + toType
-
-				if err = ConvertImage(srcPath, destPath, toType); err != nil {
+				destPath := path[:len(path)-len(ext)] + "." + toType
+				if err = ConvertImage(path, destPath, toType); err != nil {
 					return err
 				}
-
 				convertFilePaths = append(convertFilePaths, destPath)
 			}
 		}
