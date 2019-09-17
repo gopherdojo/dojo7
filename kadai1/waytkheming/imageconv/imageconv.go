@@ -53,7 +53,8 @@ func (c *Converter) Convert(i ImageFile) error {
 	if err != nil {
 		return err
 	}
-	outFile, err := os.Create(i.Name + "." + c.To)
+	outPath := i.Path[:len(i.Path)-len(filepath.Ext(i.Path))] + "." + c.To
+	outFile, err := os.Create(outPath)
 	if err != nil {
 		return err
 	}
