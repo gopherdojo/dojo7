@@ -26,7 +26,11 @@ go test ./imageconversion
 ```
 
 ```
-// カバレッジつき
+// カバレッジ
 go test -cover ./imageconversion
-go test -coverprofile=profile ./imageconversio
+go test -coverprofile=cover.out ./imageconversion
+go tool cover -html=cover.out -o cover.html
 ```
+
+- エラーケースのテストがまだできていない。
+- test しやすい設計についてもっと考えないといけない。
