@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/waytkheming/godojo/dojo7/kadai1/waytkheming/imageconv"
+	"github.com/waytkheming/godojo/dojo7/kadai2/waytkheming/imageconv"
 )
 
 type testCase struct {

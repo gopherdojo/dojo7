@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/waytkheming/godojo/dojo7/kadai1/waytkheming/cli"
+	"github.com/waytkheming/godojo/dojo7/kadai2/waytkheming/cli"
 )
 
 func main() {
