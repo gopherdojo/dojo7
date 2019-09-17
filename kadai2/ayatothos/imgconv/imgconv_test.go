@@ -51,8 +51,8 @@ var convertImageAllTests = []struct {
 	result   bool
 }{
 	// 正常系
-	{"../testdata/input/", "jpg", "png", false}, // TODO 本来trueのはず。
-
+	{"../testdata/input/", "jpg", "png", false},
+	// 異常系
 	{"../testdata/hoge", "jpg", "png", false},
 	{"../testdata/input/", "bmp", "png", false},
 }
