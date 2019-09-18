@@ -1,14 +1,10 @@
-# 課題1回答
-## 画像変換コマンド仕様
-* 指定されたディレクトリ以下の画像ファイルを再帰的に検索して処理する
-* デフォルトはJPGファイルをPNGファイルに変換
-* オプションで変更前後の形式を指定可能
-  * 前後のフォーマットが同じオプションは指定不可
-  * 返還後のファイル名が存在する場合は、処理をskip
-  * -i 問い合わせる、-f 強制上書きとかできるかな
-## 実装条件
-* mainパッケージと分離する
-* 自作パッケージと標準パッケージと準標準パッケージのみ使う
-  * 準標準パッケージ：golang.org/x以下のパッケージ
-* ユーザ定義型を作ってみる
-* GoDocを生成してみる
+# image format converter
+
+## usage
+
+`convert [-t [<SRC_IMAGE_FORMAT>][,<DEST_IMAGE_FORMAT>]] <TARGET_DIRECTORY>`
+
+## description
+
+ Search image files that's SRC_IMAGE_FORMAT type in TARGET_DIRECTORY recursively and convert to DEST_IMAGE_FORMAT type.
+ Default SRC_IMAGE_FORMAT is jpeg and default DEST_IMAGE_FORMAT is png.
