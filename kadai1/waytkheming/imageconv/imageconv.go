@@ -12,6 +12,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 )
 
@@ -53,8 +54,7 @@ func (c *Converter) Convert(i ImageFile) error {
 	if err != nil {
 		return err
 	}
-	outPath := i.Path[:len(i.Path)-len(filepath.Ext(i.Path))] + "." + c.To
-	outFile, err := os.Create(outPath)
+	outFile, err := os.Create(strings.TrimSuffix(c.Path, c.From) + c.To)
 	if err != nil {
 		return err
 	}
