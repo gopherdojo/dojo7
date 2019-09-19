@@ -11,7 +11,7 @@ import (
 func TestCLI_Run(t *testing.T) {
 	outStream, errStream := new(bytes.Buffer), new(bytes.Buffer)
 	c := cli.NewCLI(outStream, errStream)
-	args := strings.Split("convert ./../testdata", " ")
+	args := strings.Split("convert ./../testdata/earthmap1k.jpg", " ")
 	exitCode := c.Run(args)
 
 	if exitCode != cli.ExitCodeOK {

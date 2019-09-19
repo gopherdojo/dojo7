@@ -33,7 +33,7 @@ func TestConvert(t *testing.T) {
 			path:   "../testdata/earthmap1k.png",
 			from:   "png",
 			to:     "jpg",
-			output: "../testdata/earthmap1k.gif",
+			output: "../testdata/earthmap1k.jpg",
 		},
 		{
 			title:  "jpg to gif",
@@ -54,7 +54,7 @@ func TestConvert(t *testing.T) {
 			path:   "../testdata/earthmap1k.gif",
 			from:   "gif",
 			to:     "jpg",
-			output: "../testdata/earthmap1k.png",
+			output: "../testdata/earthmap1k.jpg",
 		},
 		{
 			title:  "gif to png",
@@ -93,18 +93,18 @@ func checkConvert(t *testing.T, c imageconv.Converter, i imageconv.ImageFile) {
 	}
 }
 
-func checkFormat(t *testing.T, path string, fileType string) {
+func checkFormat(t *testing.T, path string, to string) {
 	t.Helper()
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		t.Errorf("Expected output file %s %s is not exist", path, err.Error())
 	}
 	file, err := os.Open(path)
 	if err != nil {
-		t.Errorf("Couldn't open file path: %s, fileType: %s, error: %v", path, fileType, err)
+		t.Errorf("Couldn't open file path: %s, fileType: %s, error: %v", path, to, err)
 	}
 	defer file.Close()
 
-	switch fileType {
+	switch to {
 	case "jpg", "jpeg":
 		_, err = jpeg.Decode(file)
 	case "png":
@@ -114,6 +114,6 @@ func checkFormat(t *testing.T, path string, fileType string) {
 	}
 
 	if err != nil {
-		t.Errorf("Couldn't decode path: %s, fileType: %s, error: %v", path, fileType, err)
+		t.Errorf("Couldn't decode path: %s, fileType: %s, error: %v", path, to, err)
 	}
 }
