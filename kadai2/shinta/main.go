@@ -11,11 +11,10 @@ import (
 
 // passArgs は引数を受け取りその引数(ディレクトリ、変換前拡張子、変換後拡張子)が正しいか判別し、引数の値を返します。
 func passArgs() (dir string, preExt string, afterExt string, err error) {
-	d := flag.String("d", "./", "対象ディレクトリ")
-	p := flag.String("p", "jpeg", "変換前拡張子")
-	a := flag.String("a", "png", "変換後拡張子")
+	flag.StringVar(&dir, "d", "./", "対象ディレクトリ")
+	flag.StringVar(&preExt, "p", "jpeg", "変換前拡張子")
+	flag.StringVar(&afterExt, "a", "png", "変換後拡張子")
 	if flag.Parse(); flag.Parsed() {
-		dir, preExt, afterExt = *d, *p, *a
 		return
 	}
 	err = errors.New("引数のparseに失敗しました。")
@@ -24,6 +23,7 @@ func passArgs() (dir string, preExt string, afterExt string, err error) {
 
 func main() {
 	dir, preExt, afterExt, err := passArgs()
+	fmt.Println(dir, preExt, afterExt)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
