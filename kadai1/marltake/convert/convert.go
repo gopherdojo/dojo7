@@ -50,6 +50,7 @@ func ConfigConvert(src string, dest string) func(string, os.FileInfo, error) err
 	}
 }
 
+// ParseTarget parse and validate target image type option
 func ParseTarget(target string) (src string, dest string, ok bool) {
 	targets := strings.Split(target, ",")
 	allowedExt := map[string]bool{
@@ -58,22 +59,23 @@ func ParseTarget(target string) (src string, dest string, ok bool) {
 		"gif": true,
 	}
 	src, dest, ok = "", "", false
-	if len(targets) != 2 {
+	if len(targets) == 0 {
+		src, dest = "jpg", "png"
+	} else if len(targets) == 1 {
+		src, dest = targets[0], "png"
+	} else if len(targets) == 2 {
+		src, dest = targets[0], targets[1]
+	} else {
 		return
 	}
-	if targets[0] == "" {
+	if src == "" {
 		src = "jpg"
-	} else {
-		src = targets[0]
 	}
-	if targets[1] == "" {
+	if dest == "" {
 		dest = "png"
-	} else {
-		dest = targets[1]
 	}
-	if src != dest && allowedExt[src] && allowedExt[dest] {
-		ok = true
-		return
+	if ok = src != dest && allowedExt[src] && allowedExt[dest]; !ok {
+		src, dest = "", ""
 	}
 	return
 }
