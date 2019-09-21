@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"math/rand"
 	"os"
 	"time"
@@ -12,6 +13,7 @@ import (
 func main() {
 
 	var counter int
+	ch := input(os.Stdin)
 
 	words, err := RegisterWords()
 	if err != nil {
@@ -21,35 +23,34 @@ func main() {
 	wordNum := len(words)
 	rand.Seed(time.Now().UnixNano())
 
-	scanner := bufio.NewScanner(os.Stdin)
-	// answer := make(chan string)
 	var displayWord string
-	go func() {
-		for {
-			displayWord = words[rand.Intn(wordNum)]
-			fmt.Print(displayWord, " : ")
-			scanner.Scan()
-			if scanner.Text() == displayWord {
-				counter += 1
-				fmt.Println("o")
-			} else {
-				fmt.Println("x")
-			}
-		}
-	}()
+
+	displayWord = words[rand.Intn(wordNum)]
+	fmt.Print(displayWord, " : ")
 
 	bc := context.Background()
 	t := 10 * time.Second
 	ctx, cancel := context.WithTimeout(bc, t)
 	defer cancel()
 
-	select {
-	case <-time.After(4 * time.Second):
-		fmt.Println("\ntime up!\nscore :", counter)
-	case <-ctx.Done():
-		fmt.Println(ctx.Err())
+	for {
+		select {
+		case v := <-ch:
+			fmt.Println(v, "come")
+			if v == displayWord {
+				counter += 1
+				fmt.Println("o")
+			} else {
+				fmt.Println("x")
+			}
+			displayWord = words[rand.Intn(wordNum)]
+			fmt.Print(displayWord, " : ")
+		case <-ctx.Done():
+			fmt.Println("\ntime up!\nscore :", counter)
+			goto finish
+		}
 	}
-
+	finish:
 }
 
 func RegisterWords() ([]string, error) {
@@ -66,4 +67,16 @@ func RegisterWords() ([]string, error) {
 	}
 	err = f.Close()
 	return words, err
+}
+
+func input(r io.Reader) chan string {
+	c := make(chan string)
+	go func() {
+		s := bufio.NewScanner(r)
+		for s.Scan() {
+			c <- s.Text()
+		}
+		close(c)
+	}()
+	return c
 }
