@@ -13,7 +13,7 @@ import (
 
 var (
 	errPermission string
-	isDir string
+	isDir         string
 )
 
 func init() {
@@ -34,7 +34,7 @@ func init() {
 }
 
 func TestWord_Read(t *testing.T) {
-	cases := []struct{
+	cases := []struct {
 		name string
 		path string
 		want word.Words
@@ -62,27 +62,26 @@ func TestWord_Read(t *testing.T) {
 }
 
 func TestWord_Err_Read(t *testing.T) {
-	cases := []struct{
+	cases := []struct {
 		name string
 		path string
-		err error
+		err  error
 	}{
 		{
 			name: "Not exist",
 			path: "not_found.txt",
-			err: &os.PathError{Op: "open", Path: "not_found.txt", Err: syscall.Errno(syscall.ENOENT)},
+			err:  &os.PathError{Op: "open", Path: "not_found.txt", Err: syscall.Errno(syscall.ENOENT)},
 		},
 		{
 			name: "Err permission",
 			path: errPermission,
-			err: &os.PathError{Op: "open", Path: errPermission, Err: syscall.Errno(syscall.ENOENT)},
+			err:  &os.PathError{Op: "open", Path: errPermission, Err: syscall.Errno(syscall.ENOENT)},
 		},
 		{
 			name: "Is dir",
 			path: isDir,
-			err: &os.PathError{Op: "read", Path: isDir, Err: syscall.Errno(syscall.EISDIR)},
+			err:  &os.PathError{Op: "read", Path: isDir, Err: syscall.Errno(syscall.EISDIR)},
 		},
-
 	}
 	for _, c := range cases {
 		c := c
@@ -110,9 +109,8 @@ func contains(t *testing.T, s []string, e string) bool {
 	return false
 }
 
-
 func TestWords_Random(t *testing.T) {
-	cases := []struct{
+	cases := []struct {
 		name string
 		word word.Words
 	}{

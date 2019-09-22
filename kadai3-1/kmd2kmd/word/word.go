@@ -9,10 +9,9 @@ import (
 
 type Words []string
 
-func init(){
+func init() {
 	rand.Seed(time.Now().UnixNano())
 }
-
 
 func (w Words) Random() string {
 	n := rand.Int() % len(w)

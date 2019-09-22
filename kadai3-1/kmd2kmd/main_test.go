@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func TestMain_getInputChannel(t *testing.T)  {
+func TestMain_getInputChannel(t *testing.T) {
 
 	var buf bytes.Buffer
 	buf.Write([]byte("a"))
@@ -41,29 +41,29 @@ func TestMain_play(t *testing.T) {
 	}
 
 	cases := []struct {
-		name 			string
-		resultMsg        string
-		correct		 bool
+		name      string
+		resultMsg string
+		correct   bool
 	}{
 		{
-			name: "Correct a",
+			name:      "Correct a",
 			resultMsg: "Correct!!",
-			correct: true,
+			correct:   true,
 		},
 		{
-			name: "Mistake a",
+			name:      "Mistake a",
 			resultMsg: "Mistake!!",
-			correct: false,
+			correct:   false,
 		},
 		{
-			name: "Correct b",
+			name:      "Correct b",
 			resultMsg: "Correct!!",
-			correct: true,
+			correct:   true,
 		},
 		{
-			name: "Mistake b",
+			name:      "Mistake b",
 			resultMsg: "Mistake!!",
-			correct: false,
+			correct:   false,
 		},
 	}
 
@@ -83,8 +83,8 @@ func TestMain_play(t *testing.T) {
 
 func TestMain_run(t *testing.T) {
 	cases := []struct {
-		name 			string
-		args        []string
+		name string
+		args []string
 		want int
 	}{
 		{

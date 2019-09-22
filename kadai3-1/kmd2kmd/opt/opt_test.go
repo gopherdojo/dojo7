@@ -7,28 +7,28 @@ import (
 )
 
 func TestOptions(t *testing.T) {
-	cases := []struct{
-		name string
-		args []string
-		wantPath string
+	cases := []struct {
+		name        string
+		args        []string
+		wantPath    string
 		wantTimeout int
 	}{
 		{
-			name: "default",
-			args: []string{"binary"},
-			wantPath: "./words.txt",
+			name:        "default",
+			args:        []string{"binary"},
+			wantPath:    "./words.txt",
 			wantTimeout: 15,
 		},
 		{
-			name: "path",
-			args: []string{"binary", "--path=./testdata.txt"},
-			wantPath: "./testdata.txt",
+			name:        "path",
+			args:        []string{"binary", "--path=./testdata.txt"},
+			wantPath:    "./testdata.txt",
 			wantTimeout: 15,
 		},
 		{
-			name: "timeout",
-			args: []string{"binary", "--timeout=5"},
-			wantPath: "./words.txt",
+			name:        "timeout",
+			args:        []string{"binary", "--timeout=5"},
+			wantPath:    "./words.txt",
 			wantTimeout: 5,
 		},
 	}

@@ -11,16 +11,14 @@ import (
 	"time"
 )
 
-
 const (
 	ExitCodeOK = 0
 )
 
 const (
 	TerminalColorGreen = "\x1b[32m%s\x1b[0m"
-	TerminalColorRed = "\x1b[31m%s\x1b[0m"
+	TerminalColorRed   = "\x1b[31m%s\x1b[0m"
 )
-
 
 func play(outStream, errStream io.Writer, word word.Words, timeout time.Duration, inputChannel <-chan string) int {
 	timer := time.NewTicker(timeout)
@@ -60,7 +58,7 @@ func getInputChannel(r io.Reader) <-chan string {
 	return ch
 }
 
-func run(inStream io.Reader, outStream, errStream io.Writer, args []string) int{
+func run(inStream io.Reader, outStream, errStream io.Writer, args []string) int {
 	log.SetOutput(errStream)
 	options, err := opt.Parse(errStream, args)
 	if err != nil {
@@ -71,7 +69,7 @@ func run(inStream io.Reader, outStream, errStream io.Writer, args []string) int{
 		log.Fatal(err)
 	}
 	score := play(outStream, errStream, words, time.Duration(options.Timeout())*time.Second, getInputChannel(inStream))
-	fmt.Fprintln(outStream, "\nYour score is", score , "!!")
+	fmt.Fprintln(outStream, "\nYour score is", score, "!!")
 	return ExitCodeOK
 }
 
