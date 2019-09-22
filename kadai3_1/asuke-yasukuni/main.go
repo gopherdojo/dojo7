@@ -5,11 +5,9 @@ import (
 )
 
 func main() {
-
-	game := typing.SetGame([]string{
+	typing.SetGame([]string{
 		"tanuki",
 		"gouge",
 		"english",
-	})
-	game.Do()
+	}).Do()
 }

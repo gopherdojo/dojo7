@@ -28,18 +28,20 @@ func (w TestWriter) Output(outputText string) {}
 func TestTyping(t *testing.T) {
 
 	var testCase = []struct {
-		Name  string
-		Word  []string
-		Count int
+		Name     string
+		Question []string
+		Word     []string
+		Count    int
 	}{
-		{"all clear", []string{"hoge", "hoge", "hoge", "hoge"}, 4},
-		{"all fail", []string{"neko", "english", "eigo", "genzin"}, 0},
+		{"all clear", []string{"hoge", "hoge", "hoge", "hoge"}, []string{"hoge", "hoge", "hoge", "hoge"}, 4},
+		{"all fail", []string{"neeko", "enga", "els", "gezi"}, []string{"neko", "english", "eigo", "genzin"}, 0},
+		{"1 clear", []string{"hoge"}, []string{"neko", "hoge", "eigo", "genzin"}, 1},
 	}
 
 	for _, tc := range testCase {
 		game := &Game{
 			Time:   1,
-			Words:  []string{"hoge", "hoge", "hoge", "hoge"},
+			Words:  tc.Question,
 			Reader: &TestReader{TestWord: tc.Word},
 			Writer: TestWriter{},
 		}
