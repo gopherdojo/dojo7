@@ -1,20 +1,23 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"path"
 	"strconv"
+	errgroup "golang.org/x/sync/errgroup"
 )
 
 var COUNT = 4
 
 func main() {
-	//req, _ := http.NewRequest("GET", "https://misc.laboradian.com/test/003/", nil)
 
-	url := "https://misc.laboradian.com/test/003/"
+	url := "https://misc.laboradian.com/test/003"
 
 	header, err := HeaderInfo(url)
 
@@ -39,10 +42,34 @@ func main() {
 
 	// TODO: tmpディレクトリ作成
 
+	eg := errgroup.Group{}
 	for _, range_suffix := range byteRanges {
 		// 分割ダウンロードする
-		Download(url, range_suffix)
+		range_suffix := range_suffix
+		eg.Go(func() error {
+			return Download(url, range_suffix)
+		})
 	}
+
+	if err = eg.Wait(); err != nil {
+		// TODO:標準エラー出力使う
+		log.Fatal(err)
+		return
+	}
+
+	_, fileName := path.Split(url)
+	fmt.Println(fileName)
+	var filePaths []string
+	for _, suffix := range byteRanges{
+		filePaths = append(filePaths, path.Join("./tmp/", fileName + "_" + suffix))
+	}
+	// そろっていればtmpファイルを結合する
+	err = concatFiles(filePaths, "./" + fileName)
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: %v", err)
+	}
+
 }
 
 func HeaderInfo(url string) (map[string][]string, error) {
@@ -76,11 +103,11 @@ func canRangeAccess(header map[string][]string) bool {
 	return false
 }
 
-func Download(url, byteRanges string) error {
-	//fmt.Println(url, byteRanges)
+func Download(url, byteRange string) error {
+
 
 	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Set("Range", "bytes="+byteRanges)
+	req.Header.Set("Range", "bytes="+byteRange)
 
 	client := new(http.Client)
 	resp, err := client.Do(req)
@@ -88,8 +115,9 @@ func Download(url, byteRanges string) error {
 	defer resp.Body.Close()
 
 	_, fileName := path.Split(url)
+	fmt.Println(url, byteRange, fileName)
 
-	file, err := os.Create(path.Join("./tmp/", fileName, byteRanges))
+	file, err := os.Create(path.Join("./tmp/", fileName + "_" + byteRange))
 	if err != nil {
 		return err
 	}
@@ -121,4 +149,33 @@ func NthRange(length, parallel_num, n int) string {
 	} else {
 		return strconv.Itoa(bytes_per_file*(n-1)+1) + "-" + strconv.Itoa(length)
 	}
+}
+
+
+func concatFiles(filePaths []string, fileName string)error{
+
+	var writeBytes [][]byte
+
+	for _, path := range filePaths{
+		f, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+
+		// 一気に全部読み取り
+		readBytes, err := ioutil.ReadAll(f)
+		writeBytes = append(writeBytes, readBytes)
+
+		if err := f.Close(); err != nil {
+			return err
+		}
+	}
+
+	emptyByte := []byte{}
+
+	fmt.Println(fileName)
+
+	err := ioutil.WriteFile(fileName, bytes.Join(writeBytes, emptyByte), 0644)
+
+	return err
 }
