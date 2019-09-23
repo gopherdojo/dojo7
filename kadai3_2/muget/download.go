@@ -1,6 +1,7 @@
 package muget
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -8,7 +9,7 @@ import (
 	"path/filepath"
 )
 
-func DownloadFile(url string, path string) error {
+func DownloadFile(url string, path string, downloadStartSize, downloadEndSize int) error {
 	// Create the file
 	out, err := os.Create(path + filepath.Base(url))
 	if err != nil {
@@ -21,7 +22,7 @@ func DownloadFile(url string, path string) error {
 	}()
 
 	// Get the data
-	resp, err := http.Get(url)
+	resp, err := RangeRequest(url, downloadStartSize, downloadEndSize)
 	if err != nil {
 		return err
 	}
@@ -38,4 +39,18 @@ func DownloadFile(url string, path string) error {
 	}
 
 	return nil
+}
+
+// RangeRequest return *http.Response include context and range header
+func RangeRequest(url string, low, high int) (*http.Response, error) {
+	// create get request
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// set download ranges
+	req.Header.Set("Range", fmt.Sprintf("bytes=%d-%d", low, high))
+
+	return http.DefaultClient.Do(req)
 }

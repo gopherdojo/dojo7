@@ -1,5 +1,7 @@
 package muget
 
+import "context"
+
 type FileData struct {
 	Name     string
 	Size     uint
@@ -7,9 +9,14 @@ type FileData struct {
 	FullName string
 }
 
-func Run(filePath, outPutPath string) error {
+func Run(url, outPutPath string) error {
 	//TODO: 一旦普通のダウンロード
-	if err := DownloadFile(filePath, outPutPath); err != nil {
+	size, err := CheckRanges(context.Background(), url)
+	if err != nil {
+		return err
+	}
+
+	if err := DownloadFile(url, outPutPath, 0, size); err != nil {
 		return err
 	}
 	return nil
