@@ -4,29 +4,39 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	"github.com/gopherdojo/dojo7/kadai3-2/ayatothos/pdl"
 )
 
-var url = flag.String("url", "", "ダウンロードファイルURL指定")
-var divNum = flag.Int("divNum", 0, "分割数")
+var divNum = flag.Int("divNum", 10, "分割数")
 
 func main() {
 
 	flag.Parse()
 
-	if *url == "" {
-		fmt.Println("【ERROR】 ダウンロードファイルURL指定を指定してください")
+	if flag.NArg() == 0 {
+		fmt.Println("【ERROR】 ダウンロードファイルパスを指定してください")
 		os.Exit(1)
 	}
 
-	if *divNum == 0 {
-		fmt.Println("【ERROR】 分割数を指定してください")
+	// ダウンローダを生成 accept-rangesも確認
+	d, err := pdl.NewDownloader(flag.Arg(0), *divNum)
+	if err != nil {
+		fmt.Printf("【ERROR】%v\n", err)
 		os.Exit(1)
 	}
 
-	// TODO rangeアクセス可能かを確認
+	// パラレルダウンロード実行
+	if err := d.PararellDownload(); err != nil {
+		fmt.Printf("【ERROR】%v\n", err)
+		os.Exit(1)
+	}
 
-	// TODO 分割してダウンロード処理を行う
+	err = d.Merge()
+	if err != nil {
+		fmt.Printf("【ERROR】%v\n", err)
+		os.Exit(1)
+	}
 
-	// TODO 分割された結果をマージしてファイル出力する
-
+	fmt.Println("complete")
 }
