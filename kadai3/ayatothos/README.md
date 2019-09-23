@@ -11,8 +11,12 @@
 
 ## Answer
 
-### how to use
+### How to use
 
+```bash
+cd path/to/kadai3/ayatothos/typing-game
+go run main.go
+```
 
 ---
 
@@ -31,28 +35,8 @@
 
 ## Answer
 
-### テスト実行
+### How to use
 
 ```bash
-cd path/to/kadai2/ayatothos
-go test -v -coverprofile=cover.txt github.com/gopherdojo/dojo7/kadai2/ayatothos/imgconv
-```
-### テスト実行結果
-
-```bash
-=== RUN   TestGetExtentionsByName
---- PASS: TestGetExtentionsByName (0.00s)
-=== RUN   TestConvertImage
---- PASS: TestConvertImage (0.46s)
-=== RUN   TestConvertImageAll
---- PASS: TestConvertImageAll (0.12s)
-PASS
-coverage: 88.4% of statements
-ok      github.com/gopherdojo/dojo7/kadai2/ayatothos/imgconv    0.597s  coverage: 88.4% of statements
-```
-
-### カバレッジ表示
-
-```bash
-go tool cover -html=cover.txt 
+hogeoge
 ```
