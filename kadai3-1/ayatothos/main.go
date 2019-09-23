@@ -57,7 +57,7 @@ L:
 	}
 
 	score := correctNum*10 - incorrectNum*5
-	fmt.Printf("score is %v \n", score)
+	fmt.Printf("CORRECT : %v\nINCORRECT : %v\nYOUR SCORE IS %v\n", correctNum, incorrectNum, score)
 
 }
 
