@@ -26,9 +26,13 @@ analyze: ## do static code analysis
 	go vet ./...
 	golint ./...
 
+.PHONY: test
+test: ## go test ...
+	go test ./...
+
 .PHONY: remove
 remove: ## remove binary and test output data
 	rm -f ./${BINARYNAME}
 
 .PHONY: all
-all: remove clean analyze build ## run 'build' with 'remove', 'clean', 'test' and 'analyze'
+all: remove clean test analyze build ## run 'build' with 'remove', 'clean', 'test' and 'analyze'
