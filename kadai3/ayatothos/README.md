@@ -14,7 +14,8 @@
 ### How to use
 
 ```bash
-hogeoge
+cd path/to/kadai3/ayatothos/typing-game
+go run main.go
 ```
 
 ---
