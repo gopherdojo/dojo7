@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"os"
+	"time"
 
 	"github.com/gopherdojo/dojo7/kadai3/okamotoke/typinggame"
 )
@@ -23,7 +24,7 @@ func main() {
 		Questions: questions,
 	}
 
-	typinggame.Run(q)
+	typinggame.Run(q, 10*time.Second)
 
 }
 

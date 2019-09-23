@@ -9,10 +9,10 @@ import (
 )
 
 // Run starts a typing game.
-func Run(q *Game) {
+func Run(q *Game, t time.Duration) {
 
 	ch := input(os.Stdin)
-	timeCh := time.After(5 * time.Second)
+	timeCh := time.After(t)
 	var score, count int
 L:
 	for {
