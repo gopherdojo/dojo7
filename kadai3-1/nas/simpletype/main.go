@@ -29,7 +29,7 @@ func run(e *exercise.Exercise, t time.Duration) {
 	for {
 		select {
 		case <-ctx.Done():
-			fmt.Fprintf(os.Stderr, "終了 : 正解数 >>  %d\n", correct)
+			fmt.Fprintf(os.Stdout, "終了 : 正解数 >>  %d\n", correct)
 			return
 		default:
 			q := e.Get()
