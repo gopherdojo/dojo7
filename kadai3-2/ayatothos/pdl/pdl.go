@@ -64,8 +64,9 @@ func (d *Downloader) PararellDownload() error {
 
 	eg := errgroup.Group{}
 	for _, process := range *d.ProcessList {
+		p := process
 		eg.Go(func() error {
-			return process.download()
+			return p.download()
 		})
 	}
 
@@ -108,17 +109,19 @@ func createDownloadProcessList(contentLength int64, divNum int, url, name string
 
 func (dp *downloadProcess) download() error {
 
-	req, err := http.NewRequest("GET", dp.url, nil)
+	fmt.Printf("process %v start\n", dp.no)
+
+	request, err := http.NewRequest("GET", dp.url, nil)
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("リクエスト生成に失敗:%v", dp.no))
 	}
-	req.Header.Set("Range", fmt.Sprintf("bytes=%d-%d", dp.bytesToStartReading, dp.bytesToFinishReading))
+	request.Header.Set("Range", fmt.Sprintf("bytes=%d-%d", dp.bytesToStartReading, dp.bytesToFinishReading))
 
-	res, err := http.DefaultClient.Do(req)
+	response, err := http.DefaultClient.Do(request)
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("リクエストに失敗:%v", dp.no))
 	}
-	defer res.Body.Close()
+	defer response.Body.Close()
 
 	output, err := os.Create(dp.partFilePath)
 	if err != nil {
@@ -126,7 +129,10 @@ func (dp *downloadProcess) download() error {
 	}
 	defer output.Close()
 
-	io.Copy(output, res.Body)
+	io.Copy(output, response.Body)
+
+	fmt.Printf("process %v finish\n", dp.no)
+
 	return nil
 }
 
