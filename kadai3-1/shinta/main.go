@@ -12,6 +12,10 @@ import (
 
 const timeLimit = 5
 
+/*
+Typing displays the English word in question with the showtext method.
+Compare with the value entered in the judge method.
+*/
 type Typing interface {
 	ShowText() string
 	Judge(input string) bool
@@ -29,7 +33,7 @@ func main() {
 func execute(chInput <-chan string, chFinish <-chan time.Time, stdout io.Writer, t Typing) {
 
 	score := 0
-	for i := 0; ; i++ {
+	for i := 1; ; i++ {
 		fmt.Fprintf(stdout, "[%03d]: %v\n", i, t.ShowText())
 		fmt.Fprint(stdout, "type>>")
 		select {
