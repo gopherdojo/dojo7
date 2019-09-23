@@ -3,15 +3,41 @@ package typinggame
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"os"
 	"time"
 )
 
-// Run starts a typing game.
-func Run(q *Game, t time.Duration) {
+// Cli receives input from reader
+type Cli struct {
+	InputReader
+}
 
-	ch := input(os.Stdin)
+// InputReader is an interface for input
+type InputReader interface {
+	Input() <-chan string
+}
+
+// Reader is struct
+type Reader struct{}
+
+// Input receive the input from reader
+func (r *Reader) Input() <-chan string {
+	ch := make(chan string)
+
+	go func() {
+		s := bufio.NewScanner(os.Stdin)
+		for s.Scan() {
+			ch <- s.Text()
+		}
+		close(ch)
+	}()
+	return ch
+}
+
+// Run starts a typing game.
+func (c *Cli) Run(q *Game, t time.Duration) {
+
+	ch := c.Input()
 	timeCh := time.After(t)
 	var score, count int
 L:
@@ -34,19 +60,6 @@ L:
 		}
 	}
 
-}
-
-func input(r io.Reader) <-chan string {
-	ch := make(chan string)
-
-	go func() {
-		s := bufio.NewScanner(r)
-		for s.Scan() {
-			ch <- s.Text()
-		}
-		close(ch)
-	}()
-	return ch
 }
 
 func isCorrect(input, question string) bool {

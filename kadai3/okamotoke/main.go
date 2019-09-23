@@ -24,7 +24,9 @@ func main() {
 		Questions: questions,
 	}
 
-	typinggame.Run(q, 10*time.Second)
+	c := &typinggame.Cli{InputReader: &typinggame.Reader{}}
+
+	c.Run(q, 10*time.Second)
 
 }
 
