@@ -9,12 +9,12 @@ import (
 )
 
 func TestInputRoutine(t *testing.T) {
-	input := []string{"foo", "bar", "baz", "qux"}
+	input := []string{"apple", "bake", "cup", "dog"}
+	// StdinMockのinputに、標準入力で送信されたと仮定した文字列が入る
 	stdin := &StdinMock{
 		i:     0,
 		input: input,
 	}
-
 	ch := main.InputRoutine(stdin)
 
 	for _, expected := range input {
@@ -34,19 +34,20 @@ func TestExecute(t *testing.T) {
 		time      time.Time
 	}{
 		{
-			inputText: "FOO",
+			inputText: "apple",
 		},
 		{
-			inputText: "BAR",
+			inputText: "bbaak",
 		},
 		{
-			inputText: "FOO",
+			inputText: "cup",
 		},
 		{
 			time: time.Now(),
 		},
 	}
 
+	// 新しく文字列を格納するbufferを確保
 	buf := bytes.NewBufferString("")
 	typ := &TypingMock{}
 
@@ -64,13 +65,14 @@ func TestExecute(t *testing.T) {
 	main.Execute(chInput, chFinish, buf, typ)
 
 	expected := []byte("" +
-		"[001]: FOO\n" + "type>>" + "Correct!\n" +
-		"[002]: FOO\n" + "type>>" + "Miss!\n" +
-		"[003]: FOO\n" + "type>>" + "Correct!\n" +
-		"[004]: FOO\n" + "type>>" +
+		"[001]: apple\n" + "type>>" + "Correct!\n" +
+		"[002]: bake\n" + "type>>" + "Miss!\n" +
+		"[003]: cup\n" + "type>>" + "Correct!\n" +
+		"[004]: dog\n" + "type>>" +
 		"\nTime's up!!\n" +
 		"You Scored: 2\n")
 
+	// byteスライスの比較、a == bの場合は0を返す
 	if bytes.Compare(buf.Bytes(), expected) != 0 {
 		t.Errorf("[expected]:\n%s\n[actual]:\n%s", expected, buf.Bytes())
 	}
