@@ -2,38 +2,47 @@ package main
 
 import (
 	"bufio"
-	"fmt"
-	"io"
 	"os"
-	"time"
+
+	"github.com/gopherdojo/dojo7/kadai3/okamotoke/typinggame"
 )
 
 func main() {
-	ch := input(os.Stdin)
-	timeCh := time.After(2 * time.Second)
 
-L:
-	for {
-		fmt.Print(">")
-		select {
-		case input := <-ch:
-			fmt.Println(input)
-		case <-timeCh:
-			fmt.Println("time over")
-			break L
-		}
+	questions, err := getWordList()
+
+	if err != nil {
+		panic("Could not get word list")
 	}
+
+	if len(questions) < 1 {
+		panic("Could not find words")
+	}
+
+	q := &typinggame.Game{
+		Questions: questions,
+	}
+
+	typinggame.Run(q)
+
 }
 
-func input(r io.Reader) <-chan string {
-	ch := make(chan string)
+func getWordList() ([]string, error) {
+	file, err := os.Open("words.txt")
 
-	go func() {
-		s := bufio.NewScanner(r)
-		for s.Scan() {
-			ch <- s.Text()
-		}
-		close(ch)
-	}()
-	return ch
+	if err != nil {
+		return nil, err
+	}
+
+	defer file.Close()
+
+	s := bufio.NewScanner(file)
+	s.Split(bufio.ScanWords)
+	wordList := []string{}
+
+	for s.Scan() {
+		wordList = append(wordList, s.Text())
+	}
+
+	return wordList, nil
 }
