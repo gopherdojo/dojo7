@@ -10,6 +10,8 @@ import (
 // Cli receives input from reader
 type Cli struct {
 	InputReader
+	Score int
+	Count int
 }
 
 // InputReader is an interface for input
@@ -35,27 +37,26 @@ func (r *Reader) Input() <-chan string {
 }
 
 // Run starts a typing game.
-func (c *Cli) Run(q *Game, t time.Duration) {
+func (c *Cli) Run(g *Game, t time.Duration) {
 
 	ch := c.Input()
 	timeCh := time.After(t)
-	var score, count int
 L:
 	for {
-		word := q.getNextQuestion()
+		word := g.getNextQuestion()
 		fmt.Println(word)
 		select {
 		case input := <-ch:
-			count++
+			c.Count++
 			if isCorrect(input, word) {
-				score++
+				c.Score++
 				fmt.Println("Correct!")
 			} else {
 				fmt.Println("Incorrect")
 			}
 		case <-timeCh:
 			fmt.Println("time over")
-			fmt.Printf("score is %d / %d", score, count)
+			fmt.Printf("score is %d / %d", c.Score, c.Count)
 			break L
 		}
 	}
