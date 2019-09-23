@@ -12,7 +12,7 @@ import (
 // Game is main control flow of typing game
 func Game(gameTime time.Duration) (pass, total int) {
 	pass, total = 0, 0
-	timeout := time.NewTimer(gameTime)
+	timeout := time.After(gameTime)
 	rand.Seed(time.Now().UnixNano())
 	words := loadFile("data/words.txt")
 	fetchInput := make(chan string)
@@ -39,7 +39,7 @@ GAMEMAIN:
 			} else {
 				fmt.Println("Booo")
 			}
-		case <-timeout.C:
+		case <-timeout:
 			break GAMEMAIN
 		}
 	}
