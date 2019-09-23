@@ -14,16 +14,9 @@
 
 ## Answer
 
-### How to setup
-
-```bash
-cd path/to/kadai3-2/ayatothos/
-go mod vendor # 依存するパッケージをvendor以下にコピーする
-```
-※事前に環境変数のGO111MODULEをonにする必要あり（1.12以前の場合）
-
 ### How to use
 
 ```bash
-hogehoge
+cd path/to/kadai3-2/ayatothos/
+go run cmd/main.go http://ipv4.download.thinkbroadband.com/5MB.zip
 ```
