@@ -10,21 +10,21 @@ import (
 	"github.com/gopherdojo/dojo7/kadai3-1/nas/simpletype/pkg/exercise"
 )
 
-//Cli ...
+// Cli は command line tool 用の 情報を保持します。
 type Cli struct {
 	InputReader
 	Correct int
 }
 
-// InputReader ...
+// InputReader は 入出デバイス用インターフェイス
 type InputReader interface {
 	Answer() <-chan string
 }
 
-// Reader ...
+// Reader は 標準入力です。
 type Reader struct{}
 
-// Answer ...
+// Answer は  標準入力を受け取り、それらをチャンネルとして返します。
 func (r *Reader) Answer() <-chan string {
 	ch := make(chan string)
 
@@ -38,7 +38,7 @@ func (r *Reader) Answer() <-chan string {
 	return ch
 }
 
-// Run ...
+// Run はタイピングゲームを実行します。
 func (c *Cli) Run(e *exercise.Exercise, t time.Duration) {
 	bc := context.Background()
 	ctx, cancel := context.WithTimeout(bc, t)
