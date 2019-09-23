@@ -36,6 +36,7 @@ func main() {
 	}
 
 	fmt.Println("merge start")
+	// マージ
 	err = d.Merge()
 	if err != nil {
 		fmt.Printf("【ERROR】%v\n", err)
