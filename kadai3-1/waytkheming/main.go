@@ -13,7 +13,7 @@ import (
 
 func main() {
 	fmt.Println("TYPE THE WORD!")
-	questions := []string{"osaka", "tokyo", "mie", "aichi", "fukuoka"}
+	questions := []string{"osaka", "tokyo", "mie", "aichi", "fukuoka", "nagano", "chiba", "shizuoka", "yamanashi"}
 
 	var score = 0
 
