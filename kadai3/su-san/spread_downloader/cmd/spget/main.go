@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"path"
 	"strconv"
+
 	errgroup "golang.org/x/sync/errgroup"
 )
 
@@ -47,24 +47,27 @@ func main() {
 		// 分割ダウンロードする
 		range_suffix := range_suffix
 		eg.Go(func() error {
+			if downloadedFile(url, range_suffix) {
+				return nil
+			}
 			return Download(url, range_suffix)
 		})
 	}
 
 	if err = eg.Wait(); err != nil {
 		// TODO:標準エラー出力使う
-		log.Fatal(err)
+		fmt.Fprintf(os.Stderr, "ERROR: %v", err)
 		return
 	}
 
 	_, fileName := path.Split(url)
 	fmt.Println(fileName)
 	var filePaths []string
-	for _, suffix := range byteRanges{
-		filePaths = append(filePaths, path.Join("./tmp/", fileName + "_" + suffix))
+	for _, suffix := range byteRanges {
+		filePaths = append(filePaths, path.Join("./tmp/", fileName+"_"+suffix))
 	}
 	// そろっていればtmpファイルを結合する
-	err = concatFiles(filePaths, "./" + fileName)
+	err = concatFiles(filePaths, "./"+fileName)
 
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: %v", err)
@@ -103,8 +106,13 @@ func canRangeAccess(header map[string][]string) bool {
 	return false
 }
 
-func Download(url, byteRange string) error {
+func downloadedFile(url, suffix string) bool {
+	_, fileName := path.Split(url)
+	_, err := os.Stat(path.Join("./tmp/", fileName+"_"+suffix))
+	return err == nil
+}
 
+func Download(url, byteRange string) error {
 
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Range", "bytes="+byteRange)
@@ -117,7 +125,7 @@ func Download(url, byteRange string) error {
 	_, fileName := path.Split(url)
 	fmt.Println(url, byteRange, fileName)
 
-	file, err := os.Create(path.Join("./tmp/", fileName + "_" + byteRange))
+	file, err := os.Create(path.Join("./tmp/", fileName+"_"+byteRange))
 	if err != nil {
 		return err
 	}
@@ -151,12 +159,11 @@ func NthRange(length, parallel_num, n int) string {
 	}
 }
 
-
-func concatFiles(filePaths []string, fileName string)error{
+func concatFiles(filePaths []string, fileName string) error {
 
 	var writeBytes [][]byte
 
-	for _, path := range filePaths{
+	for _, path := range filePaths {
 		f, err := os.Open(path)
 		if err != nil {
 			return err
