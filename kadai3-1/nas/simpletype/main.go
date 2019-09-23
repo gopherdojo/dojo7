@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"os"
@@ -17,6 +18,19 @@ func main() {
 	run(e, t)
 }
 
+func input() <-chan string {
+	ch := make(chan string)
+
+	go func() {
+		s := bufio.NewScanner(os.Stdin)
+		for s.Scan() {
+			ch <- s.Text()
+		}
+		close(ch)
+	}()
+	return ch
+}
+
 func run(e *exercise.Exercise, t time.Duration) {
 	bc := context.Background()
 	ctx, cancel := context.WithTimeout(bc, t)
@@ -25,21 +39,20 @@ func run(e *exercise.Exercise, t time.Duration) {
 		fmt.Fprintf(os.Stderr, "問題がありません")
 		return
 	}
-	var correct int
+	var c int
+	ch := input()
 	for {
+		q := e.Get()
+		fmt.Printf("%s > ", q)
 		select {
 		case <-ctx.Done():
-			fmt.Fprintf(os.Stdout, "終了 : 正解数 >>  %d\n", correct)
+			fmt.Fprintf(os.Stdout, "終了 : 正解数 >>  %d\n", c)
 			return
-		default:
-			q := e.Get()
-			fmt.Printf("%s > ", q)
-			var a string
-			fmt.Scan(&a)
+		case a := <-ch:
 			if a != q {
-				break
+				continue
 			}
-			correct++
+			c++
 			if !e.Next() {
 				cancel()
 			}
