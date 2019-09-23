@@ -36,13 +36,11 @@ func (c *CLI) Run(args []string) int {
 	log.Printf("\x1b[33m%s\x1b[0m\n", "[imgconv start]")
 	flags := flag.NewFlagSet(args[0], flag.ContinueOnError)
 	flags.SetOutput(c.ErrStream)
-	// ショートオプション
 	flags.StringVar(&src, "s", "", "変換したい画像のファイルパスを指定")
-	flags.StringVar(&from, "f", "jpg", "変換前の画像形式を指定")
-	flags.StringVar(&to, "t", "png", "変換後の画像形式を指定")
-	// ロングオプション
 	flags.StringVar(&src, "src", "", "変換したい画像のファイルパスを指定")
+	flags.StringVar(&from, "f", "jpg", "変換前の画像形式を指定")
 	flags.StringVar(&from, "from", "jpg", "変換前の画像形式を指定")
+	flags.StringVar(&to, "t", "png", "変換後の画像形式を指定")
 	flags.StringVar(&to, "to", "png", "変換後の画像形式を指定")
 
 	if err := flags.Parse(args[1:]); err != nil {
@@ -59,6 +57,7 @@ func (c *CLI) Run(args []string) int {
 
 	err := walk(src, from, to)
 	if err != nil {
+		fmt.Fprintf(c.ErrStream, "回帰処理でエラーになりました")
 		return ExitCodeError
 	}
 

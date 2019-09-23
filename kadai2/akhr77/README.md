@@ -12,4 +12,11 @@
 - io.Readerとio.Writerがあることで
 - どういう利点があるのか具体例を挙げて考えてみる
 
+htmlでカバレッジを確認する方法
+
+```bash
+go test -coverprofile=cover.out
+go tool cover -html=cover.out -o cover.html
+```
+
 

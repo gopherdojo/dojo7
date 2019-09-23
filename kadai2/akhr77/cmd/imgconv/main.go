@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/akhr77/dojo7/kadai1/akhr77/pkg/imgconv"
+	imgconv "github.com/akhr77/dojo7/kadai2/akhr77"
 )
 
 func main() {

@@ -7,7 +7,6 @@ BINARYNAME=bin/imgconv
 
 export GO111MODULE=off
 
-.PHONY: build
 build: ## go build
 	go build -o ${BINARYNAME} cmd/imgconv/main.go
 fmt:
@@ -17,4 +16,4 @@ fmt:
 
 check:
 	${GOTEST} ./... -v
-	${GOTEST} ./... -cover
+	${GOTEST} ./... -coverprofile=cover.out
