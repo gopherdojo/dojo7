@@ -6,36 +6,43 @@ import (
 	"os"
 )
 
-func BindwithFiles(count int, ext string) error {
+func MergeFiles(count int, fileName, ext string) (err error) {
 
-	fmt.Println("\nbinding with files...")
-
-	fh, err := os.Create("gogogo"+ ext)
+	fh, err := os.Create(fileName)
 	if err != nil {
 		return err
 	}
-	defer fh.Close()
+	defer func() {
+		err = fh.Close()
+		if err != nil {
+			return
+		}
+	}()
 
 	var f string
 	for i := 0; i < count; i++ {
-		f = fmt.Sprintf("./%d%s", i,ext)
-		subfp, err := os.Open(f)
+		f = fmt.Sprintf("./%d%s", i, ext)
+		openFile, err := os.Open(f)
 		if err != nil {
 			return err
 		}
 
-		io.Copy(fh, subfp)
+		_, err = io.Copy(fh, openFile)
+		if err != nil {
+			return err
+		}
 
-		// Not use defer
-		subfp.Close()
+		err = openFile.Close()
+		if err != nil {
+			return err
+		}
 
 		// remove a file in download location for join
-		if err := os.Remove(f); err != nil {
+		err = os.Remove(f)
+		if err != nil {
 			return err
 		}
 	}
 
-	fmt.Println("Complete")
-
-	return nil
+	return
 }

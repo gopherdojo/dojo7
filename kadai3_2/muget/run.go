@@ -7,16 +7,9 @@ import (
 	"path/filepath"
 )
 
-type FileData struct {
-	Name     string
-	Size     uint
-	Dirname  string
-	FullName string
-}
-
 type Range struct {
 	Start int
-	End int
+	End   int
 }
 
 func Run(url, outPutPath string) error {
@@ -25,11 +18,13 @@ func Run(url, outPutPath string) error {
 		return err
 	}
 
-	start := 0
-	end := 0
-	var ranges []Range
+	var (
+		start, end int
+		ranges     []Range
+	)
+
 	for start <= size {
-		end = start+(size/10)
+		end = start + (size / 10)
 		ranges = append(ranges, Range{
 			Start: start,
 			End:   end,
@@ -38,14 +33,13 @@ func Run(url, outPutPath string) error {
 	}
 
 	ch := make(chan int)
-	for i,r := range ranges {
+	for i, r := range ranges {
 		go func(r Range, count int) {
-			fmt.Println(r.Start,"->",r.End)
 			if err := DownloadFile(url, outPutPath, r.Start, r.End, count); err != nil {
 				log.Fatal(err)
 			}
 			ch <- i
-		}(r,i)
+		}(r, i)
 	}
 
 	//ダウンロード完了まで待つ
@@ -55,7 +49,6 @@ D:
 		select {
 		case <-ch:
 			count++
-			fmt.Println(count)
 			if len(ranges) <= count {
 				close(ch)
 				break D
@@ -63,7 +56,10 @@ D:
 		}
 	}
 
-	if err := BindwithFiles(count, filepath.Ext(url)); err != nil {
+	fmt.Println("\nbinding with files...")
+
+	//ダウンロードファイルをマージ
+	if err := MergeFiles(count, filepath.Base(url), filepath.Ext(url)); err != nil {
 		return err
 	}
 
