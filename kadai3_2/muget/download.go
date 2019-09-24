@@ -3,21 +3,21 @@ package muget
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 )
 
-func DownloadFile(url string, path string, downloadStartSize, downloadEndSize int) error {
+func DownloadFile(url string, path string, downloadStartSize, downloadEndSize, downloadCount int) (err error) {
 	// Create the file
-	out, err := os.Create(path + filepath.Base(url))
+	out, err := os.Create(path + fmt.Sprint(downloadCount) + filepath.Ext(url))
 	if err != nil {
 		return err
 	}
 	defer func() {
-		if err := out.Close(); err != nil {
-			log.Printf("\x1b[31m%s:%s\x1b[0m\n", "[encode error]", err)
+		err = out.Close()
+		if err != nil {
+			return
 		}
 	}()
 
@@ -27,8 +27,9 @@ func DownloadFile(url string, path string, downloadStartSize, downloadEndSize in
 		return err
 	}
 	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			log.Printf("\x1b[31m%s:%s\x1b[0m\n", "[encode error]", err)
+		err = resp.Body.Close()
+		if err != nil {
+			return
 		}
 	}()
 
