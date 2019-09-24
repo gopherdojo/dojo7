@@ -33,6 +33,7 @@ func Run(url, outPutPath string) error {
 		start = end
 	}
 
+	// TODO: contextとかつかってうまくキャンセルしてあげる
 	eg := errgroup.Group{}
 	for i, r := range ranges {
 		i := i
