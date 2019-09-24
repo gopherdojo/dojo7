@@ -3,8 +3,9 @@ package muget
 import (
 	"context"
 	"fmt"
-	"log"
 	"path/filepath"
+
+	"golang.org/x/sync/errgroup"
 )
 
 type Range struct {
@@ -32,34 +33,24 @@ func Run(url, outPutPath string) error {
 		start = end
 	}
 
-	ch := make(chan int)
+	eg := errgroup.Group{}
 	for i, r := range ranges {
-		go func(r Range, count int) {
-			if err := DownloadFile(url, outPutPath, r.Start, r.End, count); err != nil {
-				log.Fatal(err)
-			}
-			ch <- i
-		}(r, i)
+		i := i
+		r := r
+		eg.Go(func() error {
+			return DownloadFile(url, outPutPath, r.Start, r.End, i)
+		})
 	}
 
 	//ダウンロード完了まで待つ
-	var count int
-D:
-	for {
-		select {
-		case <-ch:
-			count++
-			if len(ranges) <= count {
-				close(ch)
-				break D
-			}
-		}
+	if err := eg.Wait(); err != nil {
+		return err
 	}
 
 	fmt.Println("\nbinding with files...")
 
 	//ダウンロードファイルをマージ
-	if err := MergeFiles(count, filepath.Base(url), filepath.Ext(url)); err != nil {
+	if err := MergeFiles(len(ranges), filepath.Base(url), filepath.Ext(url)); err != nil {
 		return err
 	}
 
