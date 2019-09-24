@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"path/filepath"
 )
 
 type FileData struct {
@@ -60,6 +61,10 @@ D:
 				break D
 			}
 		}
+	}
+
+	if err := BindwithFiles(count, filepath.Ext(url)); err != nil {
+		return err
 	}
 
 	return nil
