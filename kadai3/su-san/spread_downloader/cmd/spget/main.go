@@ -13,7 +13,7 @@ import (
 	errgroup "golang.org/x/sync/errgroup"
 )
 
-var COUNT = 4
+var GORUTINE_NUM = 4
 
 func main() {
 
@@ -22,7 +22,7 @@ func main() {
 	header, err := HeaderInfo(url)
 
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintf(os.Stderr, "ERROR: %v", err)
 	}
 
 	var byteRanges []string
@@ -33,7 +33,7 @@ func main() {
 			fmt.Println("normal download")
 			return
 		}
-		byteRanges = ByteRanges(byte_num, 2)
+		byteRanges = ByteRanges(byte_num, GORUTINE_NUM)
 	} else {
 		fmt.Println("normal download")
 		// TODO: 分岐として通常ダウンロード処理を入れる（やるかどうかY/nで聞いてから?)
@@ -41,7 +41,14 @@ func main() {
 	}
 
 	// TODO: tmpディレクトリ作成
+	if f, err := os.Stat("./tmp"); os.IsNotExist(err) || !f.IsDir()  {
+		if err := os.Mkdir("./tmp", 0777); err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR: %v", err)
+			return
+		}
+	}
 
+	// errgroupを使ってエラー補足を行う
 	eg := errgroup.Group{}
 	for _, range_suffix := range byteRanges {
 		// 分割ダウンロードする
@@ -55,21 +62,23 @@ func main() {
 	}
 
 	if err = eg.Wait(); err != nil {
-		// TODO:標準エラー出力使う
 		fmt.Fprintf(os.Stderr, "ERROR: %v", err)
 		return
 	}
 
 	_, fileName := path.Split(url)
-	fmt.Println(fileName)
 	var filePaths []string
 	for _, suffix := range byteRanges {
 		filePaths = append(filePaths, path.Join("./tmp/", fileName+"_"+suffix))
 	}
-	// そろっていればtmpファイルを結合する
+	// tmpファイルを結合する
 	err = concatFiles(filePaths, "./"+fileName)
 
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: %v", err)
+	}
+	// 成功した場合はtmpディレクトリを削除する
+	if err := os.RemoveAll("./tmp"); err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: %v", err)
 	}
 
@@ -87,7 +96,6 @@ func HeaderInfo(url string) (map[string][]string, error) {
 		return nil, err
 	}
 
-	// fmt.Println(resp.Header)
 	return resp.Header, nil
 }
 
@@ -123,7 +131,6 @@ func Download(url, byteRange string) error {
 	defer resp.Body.Close()
 
 	_, fileName := path.Split(url)
-	fmt.Println(url, byteRange, fileName)
 
 	file, err := os.Create(path.Join("./tmp/", fileName+"_"+byteRange))
 	if err != nil {
@@ -178,11 +185,7 @@ func concatFiles(filePaths []string, fileName string) error {
 		}
 	}
 
-	emptyByte := []byte{}
-
-	fmt.Println(fileName)
-
-	err := ioutil.WriteFile(fileName, bytes.Join(writeBytes, emptyByte), 0644)
+	err := ioutil.WriteFile(fileName, bytes.Join(writeBytes, []byte{}), 0644)
 
 	return err
 }
