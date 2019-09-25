@@ -12,9 +12,6 @@ func TestFortuneDraw(t *testing.T) {
 		parameter float64
 		want      string
 	}{
-		{"Low", time.Date(2019, 9, 25, 0, 0, 0, 0, time.FixedZone("Asia/Tokyo", 60*60*9)), 0.16, Low},
-		{"Middle", time.Date(2019, 9, 25, 0, 0, 0, 0, time.FixedZone("Asia/Tokyo", 60*60*9)), 0.5, Middle},
-		{"High", time.Date(2019, 9, 25, 0, 0, 0, 0, time.FixedZone("Asia/Tokyo", 60*60*9)), 0.83, High},
 		{"Great", time.Date(2019, 9, 25, 0, 0, 0, 0, time.FixedZone("Asia/Tokyo", 60*60*9)), 1, Great},
 		{"NewYear", time.Date(2019, 1, 1, 0, 0, 0, 0, time.FixedZone("Asia/Tokyo", 60*60*9)), 0, Great},
 	}
@@ -36,13 +33,12 @@ func TestFortuneDraw(t *testing.T) {
 	}
 }
 
-func TestFortuneDrawError(t *testing.T) {
+func TestFortuneDrawInValid(t *testing.T) {
 	test := struct {
-		name      string
 		date      time.Time
 		parameter float64
 		want      string
-	}{"Invalid", time.Date(2019, 9, 25, 0, 0, 0, 0, time.FixedZone("Asia/Tokyo", 60*60*9)), 1.01, ""}
+	}{time.Date(2019, 9, 25, 0, 0, 0, 0, time.FixedZone("Asia/Tokyo", 60*60*9)), 1.01, ""}
 
 	f := &Fortune{
 		Date:      DateFunc(func() time.Time { return test.date }),
@@ -99,5 +95,20 @@ func TestCheck(t *testing.T) {
 				t.Errorf("Draw() => want %s, but got %s", tt.want, got)
 			}
 		})
+	}
+}
+
+func TestCheckInValid(t *testing.T) {
+	test := struct {
+		parameter float64
+		want      string
+	}{1.01, ""}
+
+	got, err := check(test.parameter)
+	if err == nil {
+		t.Error("Expected Error but nil")
+	}
+	if test.want != got {
+		t.Errorf("check() => want %s, but got %s", test.want, got)
 	}
 }
