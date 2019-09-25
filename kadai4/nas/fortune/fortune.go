@@ -57,7 +57,7 @@ func (f *Fortune) Draw() (string, error) {
 	}
 
 	p := random(f.Parameter)
-	l, err := draw(p)
+	l, err := check(p)
 	if err != nil {
 		return "", err
 	}
@@ -90,7 +90,7 @@ func random(p Parameter) float64 {
 	return p.Float64()
 }
 
-func draw(p float64) (string, error) {
+func check(p float64) (string, error) {
 	switch {
 	case 6.0/6.0 >= p && p > 5.0/6.0:
 		return Great, nil

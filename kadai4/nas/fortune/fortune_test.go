@@ -77,7 +77,7 @@ func TestIsNewYear(t *testing.T) {
 	}
 }
 
-func TestDraw(t *testing.T) {
+func TestCheck(t *testing.T) {
 	cases := []struct {
 		name      string
 		parameter float64
@@ -91,7 +91,7 @@ func TestDraw(t *testing.T) {
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := draw(tt.parameter)
+			got, err := check(tt.parameter)
 			if err != nil {
 				t.Errorf("Unexpected Error : %v", err)
 			}
