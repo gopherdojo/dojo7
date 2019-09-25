@@ -29,15 +29,26 @@ type Parameter interface {
 // ParameterFunc return double number
 type ParameterFunc func() float64
 
-// FortuneConfig has
-type FortuneConfig struct{}
-
-// Fortune has any fortune type
+// Fortune has
 type Fortune struct {
+	Date
+	Parameter
+}
+
+// Lack has any fortune type
+type Lack struct {
 	Type string
 }
 
 // Draw return random Fortune
-func Draw() (*Fortune, error) {
-	return &Fortune{Great}, nil
+func (f *Fortune) Draw() (*Lack, error) {
+	//d := today(f.Date)
+	return &Lack{Great}, nil
+}
+
+func today(d Date) time.Time {
+	if d == nil {
+		return time.Now()
+	}
+	return d.Today()
 }
