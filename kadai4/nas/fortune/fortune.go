@@ -3,23 +3,28 @@ package main
 import "time"
 
 const (
-	// Great fortune type
+	// Great lack type
 	Great = "大吉"
-	// High fortune type
+	// High lack type
 	High = "中吉"
-	// Middle fortune type
+	// Middle lack type
 	Middle = "吉"
-	// Low fortune type
+	// Low lack type
 	Low = "凶"
 )
 
 // Date behave today
 type Date interface {
-	Today() time.Time
+	Now() time.Time
 }
 
 // DateFunc return time
 type DateFunc func() time.Time
+
+// Now return time
+func (f DateFunc) Now() time.Time {
+	return f()
+}
 
 // Parameter behave random
 type Parameter interface {
@@ -29,20 +34,28 @@ type Parameter interface {
 // ParameterFunc return double number
 type ParameterFunc func() float64
 
+// Random return float64
+func (f ParameterFunc) Random() float64 {
+	return f()
+}
+
 // Fortune has
 type Fortune struct {
 	Date
 	Parameter
 }
 
-// Lack has any fortune type
+// Lack has any lack type
 type Lack struct {
 	Type string
 }
 
 // Draw return random Fortune
 func (f *Fortune) Draw() (*Lack, error) {
-	//d := today(f.Date)
+	d := today(f.Date)
+	if isNewYear(d) {
+		return &Lack{Great}, nil
+	}
 	return &Lack{Great}, nil
 }
 
@@ -50,5 +63,17 @@ func today(d Date) time.Time {
 	if d == nil {
 		return time.Now()
 	}
-	return d.Today()
+	return d.Now()
+}
+
+func isNewYear(d time.Time) bool {
+	_, month, day := d.Date()
+	if month != time.January {
+		return false
+	}
+	return map[int]bool{
+		1: true,
+		2: true,
+		3: true,
+	}[day]
 }
