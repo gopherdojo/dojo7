@@ -1,19 +1,20 @@
 package fortune
 
 import (
+	"reflect"
 	"testing"
 	"time"
 )
 
-func TestFortuneDraw(t *testing.T) {
+func TestFortune_Draw(t *testing.T) {
 	cases := []struct {
 		name      string
 		date      time.Time
 		parameter float64
-		want      string
+		want      *Lack
 	}{
-		{"Great", time.Date(2019, 9, 25, 0, 0, 0, 0, time.FixedZone("Asia/Tokyo", 60*60*9)), 1, Great},
-		{"NewYear", time.Date(2019, 1, 1, 0, 0, 0, 0, time.FixedZone("Asia/Tokyo", 60*60*9)), 0, Great},
+		{"Great", time.Date(2019, 9, 25, 0, 0, 0, 0, time.FixedZone("Asia/Tokyo", 60*60*9)), 1, &Lack{Great}},
+		{"NewYear", time.Date(2019, 1, 1, 0, 0, 0, 0, time.FixedZone("Asia/Tokyo", 60*60*9)), 0, &Lack{Great}},
 	}
 
 	for _, tt := range cases {
@@ -26,19 +27,19 @@ func TestFortuneDraw(t *testing.T) {
 			if err != nil {
 				t.Errorf("Unexpected Error : %v", err)
 			}
-			if tt.want != got {
+			if !reflect.DeepEqual(tt.want, got) {
 				t.Errorf("Draw() => want %s, but got %s", tt.want, got)
 			}
 		})
 	}
 }
 
-func TestFortuneDrawInValid(t *testing.T) {
+func TestFortune_DrawInValid(t *testing.T) {
 	test := struct {
 		date      time.Time
 		parameter float64
-		want      string
-	}{time.Date(2019, 9, 25, 0, 0, 0, 0, time.FixedZone("Asia/Tokyo", 60*60*9)), 1.01, ""}
+		want      *Lack
+	}{time.Date(2019, 9, 25, 0, 0, 0, 0, time.FixedZone("Asia/Tokyo", 60*60*9)), 1.01, nil}
 
 	f := &Fortune{
 		Date:      DateFunc(func() time.Time { return test.date }),

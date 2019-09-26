@@ -49,19 +49,24 @@ type Fortune struct {
 	Parameter
 }
 
+// Lack is drew results
+type Lack struct {
+	Lack string `json:"lack"`
+}
+
 // Draw return random Fortune
-func (f *Fortune) Draw() (string, error) {
+func (f *Fortune) Draw() (*Lack, error) {
 	d := today(f.Date)
 	if isNewYear(d) {
-		return Great, nil
+		return &Lack{Great}, nil
 	}
 
 	p := random(f.Parameter)
 	l, err := check(p)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return l, nil
+	return &Lack{l}, nil
 }
 
 func today(d Date) time.Time {
