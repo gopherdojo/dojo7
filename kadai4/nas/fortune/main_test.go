@@ -10,7 +10,7 @@ import (
 	"github.com/gopherdojo/dojo7/kadai4/nas/fortune/pkg/fortune"
 )
 
-func TestHandler(t *testing.T) {
+func TestFortuneHandler(t *testing.T) {
 	cases := []struct {
 		name      string
 		date      time.Time
@@ -46,17 +46,7 @@ func TestHandler(t *testing.T) {
 	}
 }
 
-func setupTest(t *testing.T, d fortune.Date, p fortune.Parameter) func() {
-	t.Helper()
-	MockDate = d
-	MockParameter = p
-	return func() {
-		MockDate = nil
-		MockParameter = nil
-	}
-}
-
-func TestHandlerNG(t *testing.T) {
+func TestFortuneHandlerNG(t *testing.T) {
 	teardown := setupTest(t, fortune.DateFunc(func() time.Time { return time.Date(2019, 9, 25, 0, 0, 0, 0, time.FixedZone("Asia/Tokyo", 60*60*9)) }), fortune.ParameterFunc(func() float64 { return 1.01 }))
 	defer teardown()
 	w := httptest.NewRecorder()
@@ -66,5 +56,15 @@ func TestHandlerNG(t *testing.T) {
 	defer rw.Body.Close()
 	if rw.StatusCode != http.StatusInternalServerError {
 		t.Errorf("unexpected status code : %d", rw.StatusCode)
+	}
+}
+
+func setupTest(t *testing.T, d fortune.Date, p fortune.Parameter) func() {
+	t.Helper()
+	MockDate = d
+	MockParameter = p
+	return func() {
+		MockDate = nil
+		MockParameter = nil
 	}
 }
