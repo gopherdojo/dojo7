@@ -22,7 +22,7 @@ type Date interface {
 	Now() time.Time
 }
 
-// DateFunc return time
+// DateFunc return time func
 type DateFunc func() time.Time
 
 // Now return time
@@ -35,7 +35,7 @@ type Parameter interface {
 	Float64() float64
 }
 
-// ParameterFunc return double number
+// ParameterFunc return float64 func
 type ParameterFunc func() float64
 
 // Float64 return float64
@@ -43,7 +43,7 @@ func (f ParameterFunc) Float64() float64 {
 	return f()
 }
 
-// Fortune has
+// Fortune has several config
 type Fortune struct {
 	Date
 	Parameter

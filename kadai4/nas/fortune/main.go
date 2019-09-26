@@ -14,7 +14,8 @@ var (
 	MockParameter fortune.Parameter
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
+// FortuneHandler response fortune result json
+func FortuneHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "applicaiton/json; charset=utf-8")
 
 	f := &fortune.Fortune{
@@ -34,6 +35,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func main() {
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/", FortuneHandler)
 	http.ListenAndServe(":8080", nil)
 }

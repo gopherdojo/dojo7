@@ -29,7 +29,7 @@ func TestHandler(t *testing.T) {
 			defer teardown()
 			w := httptest.NewRecorder()
 			r := httptest.NewRequest("GET", "/", nil)
-			handler(w, r)
+			FortuneHandler(w, r)
 			rw := w.Result()
 			defer rw.Body.Close()
 			if rw.StatusCode != http.StatusOK {
@@ -61,7 +61,7 @@ func TestHandlerNG(t *testing.T) {
 	defer teardown()
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest("GET", "/", nil)
-	handler(w, r)
+	FortuneHandler(w, r)
 	rw := w.Result()
 	defer rw.Body.Close()
 	if rw.StatusCode != http.StatusInternalServerError {
