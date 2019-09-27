@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	num :=1
+	num := 1
 	totalScore := 0
 	var tm = time.After(10 * time.Second)
 	var ch_rcv = input(os.Stdin)
@@ -36,7 +36,7 @@ func ask(number int, question string, scorePtr *int, input string){
 			fmt.Println("やった!正解!")
 			*scorePtr += 1
 		} else {
-			fmt.Println("残念...。不正解!")
+			fmt.Println("残念...。   不正解!")
 		}
 	
 }
