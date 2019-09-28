@@ -32,7 +32,11 @@ go test -v -coverprofile=cover.txt github.com/gopherdojo/dojo7/kadai4/ayatothos/
 #### テスト実行結果
 
 ```bash
-hogehoge
+=== RUN   TestFortuneHandler
+--- PASS: TestFortuneHandler (0.00s)
+PASS
+coverage: 92.9% of statements
+ok  	github.com/gopherdojo/dojo7/kadai4/ayatothos/fortune	0.013s	coverage: 92.9% of statements
 ```
 
 #### カバレッジ表示
