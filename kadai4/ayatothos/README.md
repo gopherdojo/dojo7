@@ -21,6 +21,7 @@ go run main.go
 
 #### 2. APIリクエスト
 ブラウザでもクライアントツールでも良いので http://localhost:8080/fortune にGETリクエスト
+http://localhost:8080/fortune?p=hogehoge にするとレスポンスの表示名がhogehogeになる
 
 ### ■How to test
 
