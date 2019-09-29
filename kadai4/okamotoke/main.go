@@ -8,13 +8,20 @@ import (
 	"github.com/gopherdojo/dojo7/kadai4/okamotoke/omikuji"
 )
 
+// Response holds json
 type Response struct {
 	Omikuji string `json:"omikuji"`
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
+// SeverTime holds the time function for omikuji
+type SeverTime struct {
+	Now time.Time
+}
 
-	omikuji := omikuji.Omikuji{T: time.Now()}
+// Handler is a handlers
+func (s *SeverTime) Handler(w http.ResponseWriter, r *http.Request) {
+
+	omikuji := omikuji.Omikuji{T: s.Now}
 
 	resp := Response{omikuji.Do()}
 
@@ -31,6 +38,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", handler)
+	s := SeverTime{time.Now()}
+	http.HandleFunc("/", s.Handler)
 	http.ListenAndServe(":8080", nil)
 }
