@@ -186,8 +186,6 @@ func Convert(r io.Reader, w io.Writer, t string) error {
 		return gif.Encode(w, m, gifo)
 	case "jpeg", "jpg":
 		return jpeg.Encode(w, m, jpego)
-	default:
-		return png.Encode(w, m)
 	}
 
 	return nil

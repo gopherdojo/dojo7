@@ -1,6 +1,10 @@
 package img
 
 import (
+	"bytes"
+	"encoding/base64"
+	"image"
+	"io"
 	"reflect"
 	"testing"
 )
@@ -271,4 +275,52 @@ func TestIsExpectedImage(t *testing.T) {
 
 func TestConvert(t *testing.T) {
 
+	testcases := []struct {
+		format string
+	}{
+		{format: "jpeg"},
+		{format: "jpg"},
+		{format: "png"},
+		{format: "gif"},
+	}
+
+	for _, tc := range testcases {
+		tc := tc // capture range variable. need to set when run parallel test.
+
+		t.Run(tc.format, func(t *testing.T) {
+			r := testInputFile(t)
+			w := new(bytes.Buffer)
+
+			t.Parallel()
+			Convert(r, w, tc.format)
+			_, format, err := image.DecodeConfig(w)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !(format == tc.format) {
+				t.Errorf("\ncaseName:%s\nactual:%+v\nExpected:%+v\n",
+					tc.format,
+					format,
+					tc.format,
+				)
+			}
+		})
+	}
+
+}
+
+func testOutputFile(t *testing.T) io.Writer {
+	t.Helper()
+	buf := bytes.NewBuffer([]byte{})
+	return buf
+}
+
+func testInputFile(t *testing.T) io.Reader {
+	t.Helper()
+	png1x1Base64 := "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCNdjYAAAAAIAAeIhvDMAAAAASUVORK5CYII="
+	decoded, err := base64.StdEncoding.DecodeString(png1x1Base64)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return bytes.NewReader(decoded)
 }
