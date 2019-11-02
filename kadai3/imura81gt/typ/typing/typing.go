@@ -2,6 +2,7 @@ package typing
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"math/rand"
@@ -35,8 +36,18 @@ func load() string {
 	return fmt.Sprintf("%sも%sも%sのうち", w1, w2, w3)
 }
 
+func show(score int, chars int, txt string) {
+	fmt.Println(score, chars, ">", txt)
+	fmt.Print(score, chars, " > ")
+}
+
 // Run is a function to start typing-game.
 func Run() {
+
+	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	const (
 		limit    = 60
 		interval = 10
@@ -48,10 +59,10 @@ func Run() {
 
 	txt := load()
 
+	show(score, chars, txt)
+
 B:
 	for {
-		fmt.Println(score, chars, ">", txt)
-		fmt.Print(score, chars, " > ")
 		select {
 		case v := <-chi:
 			if txt == v {
@@ -59,13 +70,18 @@ B:
 				score++
 				chars = chars + len([]rune(txt))
 				txt = load()
+				show(score, chars, txt)
 			} else {
 				fmt.Println("BAD....")
+				show(score, chars, txt)
 			}
 		case <-time.After(limit * time.Second):
 			fmt.Println()
 			fmt.Println("Time up!")
 			fmt.Println("Score:", score, "points!", chars, "charactors!")
+			cancel()
+		case <-ctx.Done():
+			fmt.Println(ctx.Err())
 			break B
 		}
 	}
