@@ -24,7 +24,6 @@ func TestShow(t *testing.T) {
 	for _, tc := range testcases {
 		tc := tc // capture range variable. need to set when run parallel test.
 
-		fmt.Println(tc)
 		t.Run(tc.caseName, func(t *testing.T) {
 			t.Parallel()
 			var buf bytes.Buffer
