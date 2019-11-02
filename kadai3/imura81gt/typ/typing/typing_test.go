@@ -6,7 +6,37 @@ import (
 	"testing"
 )
 
-func TestInput(t *testing.T) {}
+func TestInput(t *testing.T) {
+	testcases := []struct {
+		caseName string
+		input    string
+		expected string
+	}{
+		{caseName: "input some word", input: "foo bar", expected: "foo bar"},
+		{caseName: "input line feed", input: "\n", expected: ""},
+	}
+	fmt.Println(testcases)
+	for _, tc := range testcases {
+		tc := tc // capture range variable. need to set when run parallel test.
+
+		t.Run(tc.caseName, func(t *testing.T) {
+			t.Parallel()
+
+			var buf bytes.Buffer
+			buf.Write([]byte(tc.input))
+			actual := <-input(&buf)
+
+			if tc.expected != actual {
+				t.Errorf("\ncaseName:%s\nactual:%+v\nExpected:%+v\n",
+					tc.caseName,
+					actual,
+					tc.expected,
+				)
+			}
+		})
+	}
+
+}
 
 func TestLoad(t *testing.T) {}
 
