@@ -36,9 +36,8 @@ func load() string {
 	return fmt.Sprintf("%sも%sも%sのうち", w1, w2, w3)
 }
 
-func show(score int, chars int, txt string) {
-	fmt.Println(score, chars, ">", txt)
-	fmt.Print(score, chars, " > ")
+func show(score int, chars int, txt string, out io.Writer) {
+	fmt.Fprintf(out, "%d %d > %s\n%d %d > ", score, chars, txt, score, chars)
 }
 
 // Run is a function to start typing-game.
@@ -59,7 +58,7 @@ func Run() {
 
 	txt := load()
 
-	show(score, chars, txt)
+	show(score, chars, txt, os.Stdout)
 
 B:
 	for {
@@ -70,10 +69,10 @@ B:
 				score++
 				chars = chars + len([]rune(txt))
 				txt = load()
-				show(score, chars, txt)
+				show(score, chars, txt, os.Stdout)
 			} else {
 				fmt.Println("BAD....")
-				show(score, chars, txt)
+				show(score, chars, txt, os.Stdout)
 			}
 		case <-time.After(limit * time.Second):
 			fmt.Println()
