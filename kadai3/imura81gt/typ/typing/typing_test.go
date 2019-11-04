@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"testing"
+	"time"
 )
 
 func TestInput(t *testing.T) {
@@ -38,7 +39,23 @@ func TestInput(t *testing.T) {
 
 }
 
-func TestLoad(t *testing.T) {}
+func TestLoad(t *testing.T) {
+	g := Game{
+		Clock: ClockFunc(func() time.Time {
+			return time.Date(2019, 11, 04, 02, 0, 0, 0, time.UTC)
+		}),
+	}
+
+	expected := "すもももももももものうち"
+	actual := g.load()
+	if actual != expected {
+		t.Errorf("\ncaseName:%s\nactual:%+v\nExpected:%+v\n",
+			"load test",
+			actual,
+			expected,
+		)
+	}
+}
 
 func TestShow(t *testing.T) {
 	testcases := []struct {

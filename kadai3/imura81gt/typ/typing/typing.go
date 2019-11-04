@@ -10,6 +10,30 @@ import (
 	"time"
 )
 
+// ----- for time
+type Clock interface {
+	Now() time.Time
+}
+
+type ClockFunc func() time.Time
+
+func (f ClockFunc) Now() time.Time {
+	return f()
+}
+
+type Game struct {
+	Clock Clock
+}
+
+func (g *Game) now() time.Time {
+	if g.Clock == nil {
+		return time.Now()
+	}
+	return g.Clock.Now()
+}
+
+// -----------
+
 func input(r io.Reader) <-chan string {
 	ch := make(chan string)
 	go func() {
@@ -26,9 +50,9 @@ func input(r io.Reader) <-chan string {
 	return ch
 }
 
-func load() string {
+func (g *Game) load() string {
 	var ws = []string{"すもも", "もも"}
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(g.now().UnixNano())
 	w1 := ws[rand.Intn(len(ws))]
 	w2 := ws[rand.Intn(len(ws))]
 	w3 := ws[rand.Intn(len(ws))]
@@ -41,7 +65,7 @@ func show(score int, chars int, txt string, out io.Writer) {
 }
 
 // Run is a function to start typing-game.
-func Run() {
+func (g *Game) Run() {
 
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
@@ -56,7 +80,7 @@ func Run() {
 	var score int
 	var chars int
 
-	txt := load()
+	txt := g.load()
 
 	show(score, chars, txt, os.Stdout)
 
@@ -68,7 +92,7 @@ B:
 				fmt.Println("GOOD!!!")
 				score++
 				chars = chars + len([]rune(txt))
-				txt = load()
+				txt = g.load()
 				show(score, chars, txt, os.Stdout)
 			} else {
 				fmt.Println("BAD....")
