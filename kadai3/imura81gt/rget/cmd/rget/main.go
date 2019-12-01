@@ -9,10 +9,14 @@ import (
 )
 
 func main() {
-	option := rget.Option{
-		Concurrency: *flag.Int("c", 10, "concurrency"),
-	}
+	concurrency := flag.Int("c", 1, "concurrency")
+	outputDir := flag.String("o", "./", "output directory")
+
 	flag.Parse()
+	option := rget.Option{
+		Concurrency: *concurrency,
+		OutputDir:   *outputDir,
+	}
 	urls := flag.Args()
 	if len(urls) != 1 {
 		fmt.Fprintf(os.Stderr, "%s <url>\n", os.Args[0])
@@ -21,6 +25,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	option.Url = urls[0]
+	option.URL = urls[0]
+	fmt.Println(option)
 	rget.Run(option)
 }
