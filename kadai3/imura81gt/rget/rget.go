@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 
 	"golang.org/x/sync/errgroup"
 )
@@ -36,7 +38,19 @@ func Run(option Option) {
 
 	option.divide()
 
-	err = option.parallelDownload()
+	tmpDir, err := ioutil.TempDir("", "rget")
+	if err != nil {
+		fmt.Errorf("%s", err)
+	}
+	defer os.RemoveAll(tmpDir)
+	fmt.Println(tmpDir)
+
+	err = option.parallelDownload(tmpDir)
+	if err != nil {
+		fmt.Errorf("%s", err)
+	}
+
+	err = option.combine(tmpDir)
 	if err != nil {
 		fmt.Errorf("%s", err)
 	}
@@ -47,27 +61,19 @@ func (o *Option) contentLength() error {
 	//resp, err := http.Head(url)
 	resp, err := http.Head(o.URL)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		//return 0, err
 		return err
 	}
 
 	if resp.Header.Get("Accept-Ranges") == "" {
 		err := fmt.Errorf("%s URL cannot support Ranges Requests", o.URL)
-		// fmt.Fprintln(os.Stderr, err)
-		//return resp.ContentLength, err
 		return err
 	}
 	if resp.Header["Accept-Ranges"][0] == "none" {
 		err := fmt.Errorf("%s cannot support Ranges Requests", o.URL)
-		// fmt.Fprintln(os.Stderr, err)
-		//return resp.ContentLength, err
 		return err
 	}
 	if resp.ContentLength == 0 {
 		err := fmt.Errorf("%s size is %s", o.URL, resp.Header["Content-Length"][0])
-		// fmt.Fprintln(os.Stderr, err)
-		//return resp.ContentLength, err
 		return err
 	}
 
@@ -80,10 +86,9 @@ func (o *Option) contentLength() error {
 func (o *Option) divide() {
 	var units []Unit
 
-	//sbyte := contentLength / int64(concurrency)
+	//TODO: if o.ContentLength < int64(o.Concurrency)
 	sbyte := o.ContentLength / int64(o.Concurrency)
 
-	//	for i := 0; i < concurrency; i++ {
 	for i := 0; i < o.Concurrency; i++ {
 		units = append(units, Unit{
 			RangeStart:   int64(i) * sbyte,
@@ -92,16 +97,13 @@ func (o *Option) divide() {
 		})
 	}
 
+	// TODO: should distribute the remainder to each unit
+	units[len(units)-1].RangeEnd = o.ContentLength
+
 	o.Units = units
-	//return units
 }
 
-// func download(units Units) {
-// 	filepath.Split()
-// 	fmt.Println(units)
-// }
-
-func (o *Option) parallelDownload() error {
+func (o *Option) parallelDownload(tmpDir string) error {
 	fmt.Println("parallelDownload", o.Units)
 
 	eg, ctx := errgroup.WithContext(context.Background())
@@ -110,19 +112,22 @@ func (o *Option) parallelDownload() error {
 		// https://golang.org/doc/faq#closures_and_goroutines
 		i := i
 		eg.Go(func() error {
-			return o.downloadWithContext(ctx, i)
+			return o.downloadWithContext(ctx, i, tmpDir)
 		})
 	}
 
 	if err := eg.Wait(); err != nil {
-		o.clearCache()
 		return err
 	}
 
 	return nil
 }
 
-func (o *Option) downloadWithContext(ctx context.Context, i int) error {
+func (o *Option) downloadWithContext(
+	ctx context.Context,
+	i int,
+	dir string,
+) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -135,15 +140,16 @@ func (o *Option) downloadWithContext(ctx context.Context, i int) error {
 	}
 
 	// add range header
-	fmt.Printf(fmt.Sprintf("bytes=%d-%d", o.Units[i].RangeStart, o.Units[i].RangeEnd))
+	fmt.Printf(fmt.Sprintf("bytes=%d-%d\n", o.Units[i].RangeStart, o.Units[i].RangeEnd))
 	req.Header.Set("Range", fmt.Sprintf("bytes=%d-%d", o.Units[i].RangeStart, o.Units[i].RangeEnd))
 
-	client := &http.Client{}
+	client := http.DefaultClient
 	resp, err := client.Do(req)
-	defer resp.Body.Close()
 	if err != nil {
+		fmt.Printf("client err: %s", err)
 		return fmt.Errorf("Error: %v", err)
 	}
+	defer resp.Body.Close()
 
 	select {
 	case <-ctx.Done():
@@ -151,10 +157,9 @@ func (o *Option) downloadWithContext(ctx context.Context, i int) error {
 		return nil
 	default:
 		fmt.Println("default:", i, o.Units[i])
-		//return fmt.Errorf("Error: %v %+v", i, o.Units[i])
 	}
 
-	w, err := os.Create(o.Units[i].TempFileName)
+	w, err := os.Create(filepath.Join(dir, o.Units[i].TempFileName))
 	if err != nil {
 		return fmt.Errorf("Error: %v", err)
 	}
@@ -173,11 +178,29 @@ func (o *Option) downloadWithContext(ctx context.Context, i int) error {
 	return nil
 }
 
-func (o *Option) conbine() error {
-	return nil
-}
+func (o *Option) combine(dir string) error {
+	w, err := os.Create(path.Base(o.URL))
+	if err != nil {
+		return fmt.Errorf("Error: %v", err)
+	}
+	defer func() error {
+		if err := w.Close(); err != nil {
+			return fmt.Errorf("Error: %v", err)
+		}
+		return nil
+	}()
 
-func (o *Option) clearCache() error {
-	//TODO: remove temporary files
+	for _, unit := range o.Units {
+		r, err := os.Open(filepath.Join(dir, unit.TempFileName))
+		if err != nil {
+			return fmt.Errorf("Error: %v", err)
+		}
+
+		_, err = io.Copy(w, r)
+		if err != nil {
+			return fmt.Errorf("Error: %v", err)
+		}
+	}
+
 	return nil
 }
