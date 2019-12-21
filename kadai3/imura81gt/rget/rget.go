@@ -22,9 +22,18 @@ type Option struct {
 }
 
 type Unit struct {
-	RangeStart   int64
-	RangeEnd     int64
-	TempFileName string
+	RangeStart     int64
+	RangeEnd       int64
+	TempFileName   string
+	DownloadedSize int64
+}
+
+func (u *Unit) Write(data []byte) (int, error) {
+	d := len(data)
+	u.DownloadedSize += int64(d)
+	// fmt.Printf("%v is downloaded %v/%v \n",
+	// 	u.TempFileName, u.DownloadedSize, u.RangeEnd-u.RangeStart+1)
+	return d, nil
 }
 
 type Units []Unit
@@ -105,7 +114,7 @@ func (o *Option) divide() {
 	}
 
 	// TODO: should distribute the remainder to each unit
-	units[len(units)-1].RangeEnd = o.ContentLength
+	units[len(units)-1].RangeEnd = (o.ContentLength - 1)
 
 	o.Units = units
 }
@@ -178,7 +187,7 @@ func (o *Option) downloadWithContext(
 		return nil
 	}()
 
-	_, err = io.Copy(w, resp.Body)
+	_, err = io.Copy(w, io.TeeReader(resp.Body, &o.Units[i]))
 	if err != nil {
 		return fmt.Errorf("Error: %v", err)
 	}
