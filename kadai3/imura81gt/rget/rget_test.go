@@ -32,7 +32,7 @@ func TestDivide(t *testing.T) {
 		expected    Option
 	}{
 		{
-			caseName:    "ContentLength:5/5",
+			caseName:    "ContentLength and Concurrency is same value",
 			concurrency: 5,
 			expected: Option{
 				URL:           url,
@@ -48,7 +48,7 @@ func TestDivide(t *testing.T) {
 			},
 		},
 		{
-			caseName:    "ContentLength:5/1",
+			caseName:    "One Thread",
 			concurrency: 1,
 			expected: Option{
 				URL:           url,
@@ -60,7 +60,20 @@ func TestDivide(t *testing.T) {
 			},
 		},
 		{
-			caseName:    "ContentLength:5/10",
+			caseName:    "Remainder:ContentLength%Concurrency!=0",
+			concurrency: 2,
+			expected: Option{
+				URL:           url,
+				ContentLength: contentLength,
+				Concurrency:   2,
+				Units: []Unit{
+					{TempFileName: "0_test.iso", RangeStart: 0, RangeEnd: 1},
+					{TempFileName: "1_test.iso", RangeStart: 2, RangeEnd: 4},
+				},
+			},
+		},
+		{
+			caseName:    "Concurrency exceed the contentLength.",
 			concurrency: 10,
 			expected: Option{
 				URL:           url,
