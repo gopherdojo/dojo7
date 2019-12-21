@@ -140,8 +140,9 @@ func (o *Option) downloadWithContext(
 	}
 
 	// add range header
-	fmt.Printf(fmt.Sprintf("bytes=%d-%d\n", o.Units[i].RangeStart, o.Units[i].RangeEnd))
-	req.Header.Set("Range", fmt.Sprintf("bytes=%d-%d", o.Units[i].RangeStart, o.Units[i].RangeEnd))
+	byteRange := fmt.Sprintf("bytes=%d-%d", o.Units[i].RangeStart, o.Units[i].RangeEnd)
+	fmt.Println(byteRange)
+	req.Header.Set("Range", byteRange)
 
 	client := http.DefaultClient
 	resp, err := client.Do(req)
@@ -154,7 +155,7 @@ func (o *Option) downloadWithContext(
 	select {
 	case <-ctx.Done():
 		fmt.Printf("Done: %v %+v\n", i, o.Units[i])
-		return nil
+		return fmt.Errorf("Error: %v", err)
 	default:
 		fmt.Println("default:", i, o.Units[i])
 	}
