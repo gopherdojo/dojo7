@@ -14,7 +14,7 @@ import (
 )
 
 type Option struct {
-	Concurrency   int
+	Concurrency   uint
 	URL           string
 	OutputDir     string
 	ContentLength int64
@@ -86,10 +86,17 @@ func (o *Option) contentLength() error {
 func (o *Option) divide() {
 	var units []Unit
 
-	//TODO: if o.ContentLength < int64(o.Concurrency)
+	if o.Concurrency == 0 {
+		o.Concurrency = 1
+	}
+
+	if o.ContentLength < int64(o.Concurrency) {
+		o.Concurrency = uint(o.ContentLength)
+	}
+
 	sbyte := o.ContentLength / int64(o.Concurrency)
 
-	for i := 0; i < o.Concurrency; i++ {
+	for i := 0; i < int(o.Concurrency); i++ {
 		units = append(units, Unit{
 			RangeStart:   int64(i) * sbyte,
 			RangeEnd:     int64((i+1))*sbyte - 1,

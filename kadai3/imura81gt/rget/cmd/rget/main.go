@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	concurrency := flag.Int("c", 2, "concurrency")
+	concurrency := flag.Uint("c", 2, "concurrency")
 	outputDir := flag.String("o", "./", "output directory")
 
 	flag.Parse()
