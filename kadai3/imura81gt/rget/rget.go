@@ -38,32 +38,33 @@ func (u *Unit) Write(data []byte) (int, error) {
 
 type Units []Unit
 
-func Run(option Option) {
+func Run(option Option) error {
 	fmt.Printf("%+v\n", option)
 	err := option.checkingHeaders()
 	if err != nil {
-		fmt.Errorf("%s", err)
+		return fmt.Errorf("%s", err)
 	}
 
 	option.divide()
 
 	tmpDir, err := ioutil.TempDir("", "rget")
 	if err != nil {
-		fmt.Errorf("%s", err)
+		return fmt.Errorf("%s", err)
 	}
 	defer os.RemoveAll(tmpDir)
 	fmt.Println(tmpDir)
 
 	err = option.parallelDownload(tmpDir)
 	if err != nil {
-		fmt.Errorf("%s", err)
+		return fmt.Errorf("%s", err)
 	}
 
 	err = option.combine(tmpDir)
 	if err != nil {
-		fmt.Errorf("%s", err)
+		return fmt.Errorf("%s", err)
 	}
 
+	return nil
 }
 
 func (o *Option) checkingHeaders() error {
@@ -173,6 +174,8 @@ func (o *Option) downloadWithContext(
 	req.Header.Set("Range", byteRange)
 
 	client := http.DefaultClient
+	// TODO: should check resp.StatusCode.
+	//   client.Do cannot seems to return the err when statusCode is 50x etc.
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Printf("client err: %s", err)

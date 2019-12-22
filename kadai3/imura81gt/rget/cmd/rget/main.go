@@ -27,5 +27,9 @@ func main() {
 
 	option.URL = urls[0]
 	fmt.Println(option)
-	rget.Run(option)
+	err := rget.Run(option)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "err: %s", err)
+		os.Exit(1)
+	}
 }
