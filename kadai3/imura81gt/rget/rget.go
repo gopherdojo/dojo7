@@ -40,7 +40,7 @@ type Units []Unit
 
 func Run(option Option) {
 	fmt.Printf("%+v\n", option)
-	err := option.contentLength()
+	err := option.checkingHeaders()
 	if err != nil {
 		fmt.Errorf("%s", err)
 	}
@@ -66,8 +66,7 @@ func Run(option Option) {
 
 }
 
-func (o *Option) contentLength() error {
-	//resp, err := http.Head(url)
+func (o *Option) checkingHeaders() error {
 	resp, err := http.Head(o.URL)
 	if err != nil {
 		return err
@@ -77,17 +76,30 @@ func (o *Option) contentLength() error {
 		err := fmt.Errorf("%s URL cannot support Ranges Requests", o.URL)
 		return err
 	}
+
 	if resp.Header["Accept-Ranges"][0] == "none" {
 		err := fmt.Errorf("%s cannot support Ranges Requests", o.URL)
 		return err
 	}
+
 	if resp.ContentLength == 0 {
 		err := fmt.Errorf("%s size is %s", o.URL, resp.Header["Content-Length"][0])
 		return err
 	}
 
+	redirectURL := resp.Request.URL.String()
+	if err != nil {
+		return err
+	}
+
 	o.ContentLength = resp.ContentLength
-	//return resp.ContentLength, nil
+
+	// keep the redirect URL that accept Ranges Requests because some mirror sites may deny.
+	// TODO: redirectURL should set by Unit separately.
+	if o.URL != redirectURL {
+		o.URL = redirectURL
+	}
+
 	return err
 }
 

@@ -12,10 +12,7 @@ func TestWrite(t *testing.T) {
 func TestRun(t *testing.T) {
 }
 
-func TestContentLength(t *testing.T) {
-}
-
-func TestAcceptRangesHeaderCheck(t *testing.T) {
+func TestCheckingHeaders(t *testing.T) {
 }
 
 //func divide(contentLength int64, concurrency int) Units {
