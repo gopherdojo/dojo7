@@ -74,24 +74,21 @@ func (o *Option) checkingHeaders() error {
 	}
 
 	if resp.Header.Get("Accept-Ranges") == "" {
-		err := fmt.Errorf("%s URL cannot support Ranges Requests", o.URL)
+		err := fmt.Errorf("%s : %s cannot support Ranges Requests", o.URL, resp.Request.URL.String())
 		return err
 	}
 
 	if resp.Header["Accept-Ranges"][0] == "none" {
-		err := fmt.Errorf("%s cannot support Ranges Requests", o.URL)
+		err := fmt.Errorf("%s : %s cannot support Ranges Requests", o.URL, resp.Request.URL.String())
 		return err
 	}
 
-	if resp.ContentLength == 0 {
-		err := fmt.Errorf("%s size is %s", o.URL, resp.Header["Content-Length"][0])
+	if resp.Header["Content-Length"] == nil {
+		err := fmt.Errorf("%s size is nil", o.URL)
 		return err
 	}
 
 	redirectURL := resp.Request.URL.String()
-	if err != nil {
-		return err
-	}
 
 	o.ContentLength = resp.ContentLength
 
