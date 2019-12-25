@@ -83,7 +83,7 @@ func (o *Option) checkingHeaders() error {
 		return err
 	}
 
-	if resp.Header["Content-Length"] == nil {
+	if resp.ContentLength == 0 {
 		err := fmt.Errorf("%s size is nil", o.URL)
 		return err
 	}

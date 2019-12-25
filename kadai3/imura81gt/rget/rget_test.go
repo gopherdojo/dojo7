@@ -2,10 +2,14 @@ package rget
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 )
@@ -35,24 +39,25 @@ func TestCheckingHeaders(t *testing.T) {
 		t.Run(tc.caseName, func(t *testing.T) {
 			t.Parallel()
 
-			ts := SetupHhttpServer(t, tc.acceptRanges, tc.body)
+			ts := SetupHTTPServer(t, tc.acceptRanges, tc.body)
 			defer ts.Close()
 
 			// resp, _ := http.Get(ts.URL)
 			// t.Logf("resp: %+v", resp)
 
-			o := Option{URL: ts.URL}
-			err := o.checkingHeaders()
-			t.Logf("err: %+v", err)
+			resp, err := http.Head(ts.URL)
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Logf("ContentLength: %+v,Accept-Ranges: %+v", resp.ContentLength, resp.Header.Get("Accept-Ranges"))
 
-			if tc.isErr && tc.body != "" && err == nil {
-				t.Errorf("actual: %+v\nexpected: %+v\n", err, tc.isErr)
+			o := Option{URL: ts.URL}
+			exerr := o.checkingHeaders()
+			if tc.isErr && exerr == nil {
+				t.Errorf("tc.isErr %+v but err is %+v", tc.isErr, exerr)
 			}
-			if tc.isErr && tc.body != "" && !strings.Contains(err.Error(), tc.expected) {
-				t.Errorf("actual: %+v\nexpected: %+v\n", err, tc.expected)
-			}
-			if tc.isErr && tc.body == "" && !strings.Contains(err.Error(), tc.expected) {
-				t.Errorf("actual: %+v\nexpected: %+v\n", err, tc.isErr)
+			if tc.isErr && exerr != nil && !strings.Contains(exerr.Error(), tc.expected) {
+				t.Errorf("actual: %+v\nexpected: %+v\n", exerr, tc.isErr)
 			}
 		})
 	}
@@ -160,6 +165,85 @@ func TestDivide(t *testing.T) {
 }
 
 func TestParallelDownload(t *testing.T) {
+
+	type Expected []struct {
+		TempFileName string
+		Text         string
+	}
+
+	testCases := []struct {
+		caseName     string
+		acceptRanges string
+		body         string
+		option       Option
+		expected     Expected
+	}{
+		{
+			caseName: "acceptRanges:bytes", acceptRanges: "bytes", body: "12345",
+			option: Option{
+				Units: []Unit{
+					{TempFileName: "0_test.iso", RangeStart: 0, RangeEnd: 0},
+					{TempFileName: "1_test.iso", RangeStart: 1, RangeEnd: 1},
+					{TempFileName: "2_test.iso", RangeStart: 2, RangeEnd: 2},
+					{TempFileName: "3_test.iso", RangeStart: 3, RangeEnd: 3},
+					{TempFileName: "4_test.iso", RangeStart: 4, RangeEnd: 4},
+				},
+			},
+			expected: Expected{
+				{TempFileName: "0_test.iso", Text: "1"},
+				{TempFileName: "1_test.iso", Text: "2"},
+				{TempFileName: "2_test.iso", Text: "3"},
+				{TempFileName: "3_test.iso", Text: "4"},
+				{TempFileName: "4_test.iso", Text: "5"},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.caseName, func(t *testing.T) {
+			t.Parallel()
+
+			prefix := "rget_test"
+			tmpDir, err := ioutil.TempDir("", prefix)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			ts := SetupHTTPServer(t, tc.acceptRanges, tc.body)
+			defer ts.Close()
+
+			tc.option.URL = ts.URL
+			resp, err := http.Head(tc.option.URL)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			tc.option.ContentLength = resp.ContentLength
+
+			err = tc.option.parallelDownload(tmpDir)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			for _, ex := range tc.expected {
+				f, err := os.Open(filepath.Join(tmpDir, ex.TempFileName))
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				actual, err := ioutil.ReadAll(f)
+				if ex.Text != string(actual) {
+					t.Errorf("actual: %+v\nexpected: %+v\n", string(actual), ex.Text)
+				}
+
+			}
+			// t.Log(tmpDir)
+			os.RemoveAll(tmpDir)
+
+		})
+	}
+
 }
 
 func TestDownloadWithContext(t *testing.T) {
@@ -168,13 +252,18 @@ func TestDownloadWithContext(t *testing.T) {
 func TestCombine(t *testing.T) {
 }
 
-func SetupHhttpServer(t *testing.T, ac string, body string) *httptest.Server {
+func SetupHTTPServer(t *testing.T, ac string, body string) *httptest.Server {
 	t.Helper()
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Accept-Ranges", ac)
-		if body != "" {
-			fmt.Fprintln(w, body)
+		// the unsupported server for Range request
+		if ac != "bytes" {
+			w.Header().Set("Accept-Ranges", ac)
+			fmt.Fprint(w, body)
+		} else {
+			// the supported server for Range request
+			http.ServeContent(w, r, "", time.Unix(0, 0), strings.NewReader(body))
 		}
+
 	}))
 	return ts
 }
