@@ -179,7 +179,7 @@ func TestParallelDownload(t *testing.T) {
 		expected     Expected
 	}{
 		{
-			caseName: "acceptRanges:bytes", acceptRanges: "bytes", body: "12345",
+			caseName: "acceptRanges:bytes per 1byte", acceptRanges: "bytes", body: "12345",
 			option: Option{
 				Units: []Unit{
 					{TempFileName: "0_test.iso", RangeStart: 0, RangeEnd: 0},
@@ -195,6 +195,44 @@ func TestParallelDownload(t *testing.T) {
 				{TempFileName: "2_test.iso", Text: "3"},
 				{TempFileName: "3_test.iso", Text: "4"},
 				{TempFileName: "4_test.iso", Text: "5"},
+			},
+		},
+		{
+			caseName: "acceptRanges:bytes per 2bytes", acceptRanges: "bytes", body: "0123456789",
+			option: Option{
+				Units: []Unit{
+					{TempFileName: "0_test.iso", RangeStart: 0, RangeEnd: 1},
+					{TempFileName: "1_test.iso", RangeStart: 2, RangeEnd: 3},
+					{TempFileName: "2_test.iso", RangeStart: 4, RangeEnd: 5},
+					{TempFileName: "3_test.iso", RangeStart: 6, RangeEnd: 7},
+					{TempFileName: "4_test.iso", RangeStart: 8, RangeEnd: 9},
+				},
+			},
+			expected: Expected{
+				{TempFileName: "0_test.iso", Text: "01"},
+				{TempFileName: "1_test.iso", Text: "23"},
+				{TempFileName: "2_test.iso", Text: "45"},
+				{TempFileName: "3_test.iso", Text: "67"},
+				{TempFileName: "4_test.iso", Text: "89"},
+			},
+		},
+		{
+			caseName: "acceptRanges:bytes per 2bytes+1", acceptRanges: "bytes", body: "01234567890",
+			option: Option{
+				Units: []Unit{
+					{TempFileName: "0_test.iso", RangeStart: 0, RangeEnd: 1},
+					{TempFileName: "1_test.iso", RangeStart: 2, RangeEnd: 3},
+					{TempFileName: "2_test.iso", RangeStart: 4, RangeEnd: 5},
+					{TempFileName: "3_test.iso", RangeStart: 6, RangeEnd: 7},
+					{TempFileName: "4_test.iso", RangeStart: 8, RangeEnd: 10},
+				},
+			},
+			expected: Expected{
+				{TempFileName: "0_test.iso", Text: "01"},
+				{TempFileName: "1_test.iso", Text: "23"},
+				{TempFileName: "2_test.iso", Text: "45"},
+				{TempFileName: "3_test.iso", Text: "67"},
+				{TempFileName: "4_test.iso", Text: "890"},
 			},
 		},
 	}
