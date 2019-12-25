@@ -62,6 +62,15 @@ func TestCheckingHeaders(t *testing.T) {
 		})
 	}
 
+	t.Run("Invalid URL", func(t *testing.T) {
+		oEmpty := Option{URL: "s3://example.com"}
+		exerr := oEmpty.checkingHeaders()
+		t.Log(exerr)
+		if exerr == nil {
+			t.Error("invalid URL but err is nil")
+		}
+	})
+
 }
 
 //func divide(contentLength int64, concurrency int) Units {
