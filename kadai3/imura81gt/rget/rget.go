@@ -208,7 +208,7 @@ func (o *Option) downloadWithContext(
 }
 
 func (o *Option) combine(dir string) error {
-	w, err := os.Create(path.Base(o.URL))
+	w, err := os.Create(filepath.Join(o.OutputDir, path.Base(o.URL)))
 	if err != nil {
 		return fmt.Errorf("Error: %v", err)
 	}
